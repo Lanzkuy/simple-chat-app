@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -41,6 +42,10 @@ dependencies {
 
     //Firebase
     implementation 'com.google.firebase:firebase-firestore:24.4.0'
+
+    //Dagger - Hilt
+    implementation 'com.google.dagger:hilt-android:2.44'
+    annotationProcessor 'com.google.dagger:hilt-compiler:2.44'
 
     //Test
     testImplementation 'junit:junit:4.13.2'
