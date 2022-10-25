@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "97021474830",
+    "firebase_url": "https://simple-chat-app-d0ab8-default-rtdb.firebaseio.com",
+    "project_id": "simple-chat-app-d0ab8",
+    "storage_bucket": "simple-chat-app-d0ab8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97021474830:android:4a02d6f395561662dc645f",
+        "android_client_info": {
+          "package_name": "com.lacorp.simple_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97021474830-2lraqgo3jq1gjt1vn22mlvn6mqsfjnsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxMsZ3SFQOTKbaBV-09IHSRiHNnkqTt00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "97021474830-2lraqgo3jq1gjt1vn22mlvn6mqsfjnsh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
