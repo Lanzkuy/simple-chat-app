@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +18,8 @@ import com.lacorp.simple_chat_app.R;
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentLoginBinding;
 import com.lacorp.simple_chat_app.presentation.viewmodel.LoginViewModel;
+
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -38,6 +41,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).hide();
         initializeComponent();
         handleState();
     }
@@ -47,23 +51,30 @@ public class LoginFragment extends Fragment {
             String username = fragmentLoginBinding.etUsername.getText().toString();
             String password = fragmentLoginBinding.etPassword.getText().toString();
 
-            if(username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your username and password", Toast.LENGTH_SHORT).show();
+            if(username.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter your username", Toast.LENGTH_SHORT).show();
+                return;
             }
-            else {
-                loginViewModel.loginUser(username, password);
+
+            if(password.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter your password", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            loginViewModel.loginUser(username, password);
         });
+
+        fragmentLoginBinding.tvRegister.setOnClickListener(view -> requireActivity()
+                .getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view, RegisterFragment.class, null)
+                .commit());
     }
 
     private void handleState() {
         loginViewModel.loggedInUser.observe(getViewLifecycleOwner(), userResource -> {
             switch (userResource.status) {
                 case SUCCESS: {
-                    fragmentLoginBinding.progressBar.setVisibility(View.GONE);
-                    fragmentLoginBinding.parentLayout.setBackgroundTintList(AppCompatResources
-                            .getColorStateList(requireContext(), R.color.custom_white));
-
+                    progressBarOff();
                     User user = userResource.data;
                     if(user != null) {
                         if(user.getUser_id() == null) {
@@ -78,20 +89,27 @@ public class LoginFragment extends Fragment {
                     break;
                 }
                 case FAILURE: {
-                    fragmentLoginBinding.progressBar.setVisibility(View.GONE);
-                    fragmentLoginBinding.parentLayout.setBackgroundTintList(AppCompatResources
-                            .getColorStateList(requireContext(), R.color.custom_white));
-
+                    progressBarOff();
                     Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case LOADING: {
-                    fragmentLoginBinding.progressBar.setVisibility(View.VISIBLE);
-                    fragmentLoginBinding.parentLayout.setBackgroundTintList(AppCompatResources
-                            .getColorStateList(requireContext(), R.color.custom_placeholder));
+                    progressBarOn();
                     break;
                 }
             }
         });
+    }
+
+    private void progressBarOn() {
+        fragmentLoginBinding.progressBar.setVisibility(View.VISIBLE);
+        fragmentLoginBinding.layoutParent.setBackgroundTintList(AppCompatResources
+                .getColorStateList(requireContext(), R.color.custom_placeholder));
+    }
+
+    private void progressBarOff() {
+        fragmentLoginBinding.progressBar.setVisibility(View.GONE);
+        fragmentLoginBinding.layoutParent.setBackgroundTintList(AppCompatResources
+                .getColorStateList(requireContext(), R.color.custom_white));
     }
 }

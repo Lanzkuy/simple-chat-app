@@ -1,11 +1,8 @@
 package com.lacorp.simple_chat_app.data.repository;
 
-import android.content.SharedPreferences;
-
-import androidx.lifecycle.MutableLiveData;
+import static com.lacorp.simple_chat_app.utils.Constants.USER_COLLECTION;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IUserRepository;
@@ -13,39 +10,35 @@ import com.lacorp.simple_chat_app.utils.Resource;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 public class UserRepository implements IUserRepository {
 
     private final FirebaseFirestore firestore;
-    private final SharedPreferences sharedPreferences;
 
-    @Inject
-    public UserRepository(FirebaseFirestore firestore, SharedPreferences sharedPreferences) {
+    public UserRepository(FirebaseFirestore firestore) {
         this.firestore = firestore;
-        this.sharedPreferences = sharedPreferences;
     }
 
     @Override
-    public Resource<MutableLiveData<List<User>>> getAllUsers() {
+    public Flowable<Resource<List<User>>> getAllUsers() {
         return null;
     }
 
     @Override
-    public Resource<MutableLiveData<List<User>>> getAllUserFriends() {
+    public Flowable<Resource<List<User>>> getAllUserFriends() {
         return null;
     }
 
     @Override
-    public Flowable<Resource<User>> signIn(String username, String password) {
-        return Flowable.create(emitter -> {
-            Query querySnapshot = firestore.collection("users")
+    public Single<Resource<User>> login(String username, String password) {
+        return Single.create(emitter -> {
+            Query querySnapshot = firestore.collection(USER_COLLECTION)
                             .whereEqualTo("username", username)
                             .whereEqualTo("password", password);
-            final ListenerRegistration registration = querySnapshot.addSnapshotListener((value, error) -> {
+            querySnapshot.addSnapshotListener((value, error) -> {
                 if(error != null) {
                     emitter.onError(error);
                 }
@@ -53,20 +46,25 @@ public class UserRepository implements IUserRepository {
                 if(value != null) {
                     if(!value.isEmpty()) {
                         User user = value.toObjects(User.class).get(0);
-                        emitter.onNext(Resource.Success(user));
+                        emitter.onSuccess(Resource.Success(user));
                     }
                     else {
-                        emitter.onNext(Resource.Success(new User()));
+                        emitter.onSuccess(Resource.Success(new User()));
                     }
                 }
             });
-
-            emitter.setCancellable(registration::remove);
-        }, BackpressureStrategy.BUFFER);
+        });
     }
 
     @Override
-    public Resource<Boolean> signUp(User user) {
-        return null;
+    public Completable register(User user) {
+        return Completable.create(emitter -> {
+            String newId = firestore.collection(USER_COLLECTION).document().getId();
+            user.setUser_id(newId);
+
+            firestore.collection(USER_COLLECTION).document(newId).set(user)
+                    .addOnSuccessListener(e -> emitter.onComplete())
+                    .addOnFailureListener(emitter::onError);
+        });
     }
 }
