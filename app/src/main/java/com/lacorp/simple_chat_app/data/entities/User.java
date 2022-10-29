@@ -2,10 +2,14 @@ package com.lacorp.simple_chat_app.data.entities;
 
 public class User {
 
-    private final String user_id;
-    private final String username;
-    private final String password;
-    private final String fullname;
+    private String user_id;
+    private String username;
+    private String password;
+    private String fullname;
+
+    public User() {
+
+    }
 
     public User(String user_id, String username, String password, String fullname) {
         this.user_id = user_id;

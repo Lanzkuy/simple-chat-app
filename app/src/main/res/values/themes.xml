@@ -1,16 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Simplechatapp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.SimpleChatApp.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/primary_50</item>
+        <item name="colorPrimaryVariant">@color/primary_70</item>
+        <item name="colorOnPrimary">@color/custom_white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/primary_30</item>
+        <item name="colorSecondaryVariant">@color/primary_90</item>
+        <item name="colorOnSecondary">@color/custom_black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.SimpleChatApp.ActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/primary_50</item>
+        <item name="colorPrimaryVariant">@color/primary_70</item>
+        <item name="colorOnPrimary">@color/custom_white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/primary_30</item>
+        <item name="colorSecondaryVariant">@color/primary_90</item>
+        <item name="colorOnSecondary">@color/custom_black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="actionBarTheme">@style/CustomActionBar</item>
+    </style>
+    <style name="CustomActionBar" parent="@style/ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="android:background">@color/primary_50</item>
+        <item name="titleTextColor">@color/custom_white</item>
+        <item name="android:textColor">@color/custom_white</item>
+        <item name="actionOverflowButtonStyle">@style/CustomOverflowButtonActionBar</item>
+    </style>
+    <style name="CustomOverflowButtonActionBar" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/custom_white</item>
+    </style>
+    <style name="roundedImageViewRounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

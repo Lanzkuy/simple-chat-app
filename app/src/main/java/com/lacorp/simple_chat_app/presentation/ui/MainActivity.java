@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.lacorp.simple_chat_app.R;
+import com.lacorp.simple_chat_app.databinding.ActivityMainBinding;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -15,5 +16,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                    .commit();
+        }
     }
 }

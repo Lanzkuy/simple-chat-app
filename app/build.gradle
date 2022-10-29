@@ -47,6 +47,10 @@ dependencies {
     implementation 'com.google.dagger:hilt-android:2.44'
     annotationProcessor 'com.google.dagger:hilt-compiler:2.44'
 
+    //RxJava
+    implementation "io.reactivex.rxjava3:rxjava:3.0.0"
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
     //Test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

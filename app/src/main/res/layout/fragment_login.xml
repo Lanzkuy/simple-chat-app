@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/custom_white"
+    android:backgroundTintMode="multiply">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="150dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/app_name"
+            android:textColor="@color/primary_50"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/etUsername"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etUsername"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="16dp"
+            android:background="@drawable/edit_text_background"
+            android:hint="@string/hintUsername"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/custom_black"
+            android:textColorHint="@color/custom_placeholder"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/etPassword"
+            app:layout_constraintTop_toBottomOf="@id/tvAppName"
+            tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="16dp"
+            android:background="@drawable/edit_text_background"
+            android:hint="@string/hintPassword"
+            android:inputType="textPassword"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/custom_black"
+            android:textColorHint="@color/custom_placeholder"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/btnLogin"
+            app:layout_constraintTop_toBottomOf="@id/etUsername"
+            tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="12dp"
+            android:background="@drawable/button_background"
+            android:text="@string/textLogin"
+            android:textColor="@color/custom_white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/layoutRegister"
+            app:layout_constraintTop_toBottomOf="@id/etPassword" />
+
+        <LinearLayout
+            android:id="@+id/layoutRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/btnLogin"
+            app:layout_constraintStart_toStartOf="@id/btnLogin"
+            app:layout_constraintTop_toBottomOf="@id/btnLogin">
+
+            <TextView
+                android:id="@+id/tvDontHaveAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="@string/dont_have_account"
+                android:textColor="@color/custom_black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/textRegister"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="16sp"
+                tools:ignore="TextContrastCheck" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@color/primary_70"
+        android:visibility="gone" />
+
+</RelativeLayout>

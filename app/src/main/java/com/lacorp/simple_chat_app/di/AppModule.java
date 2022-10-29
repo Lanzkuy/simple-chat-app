@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.lacorp.simple_chat_app.data.repository.UserRepository;
+import com.lacorp.simple_chat_app.domain.repository.IUserRepository;
+import com.lacorp.simple_chat_app.domain.usecase.LoginUseCase;
 
 import javax.inject.Singleton;
 
@@ -29,5 +32,17 @@ public class AppModule {
     @Singleton
     public SharedPreferences provideSharedPreference(@ApplicationContext Context context) {
         return context.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+    }
+
+    @Provides
+    @Singleton
+    public IUserRepository provideUserRepository(FirebaseFirestore firestore, SharedPreferences sharedPreferences) {
+        return new UserRepository(firestore, sharedPreferences);
+    }
+
+    @Provides
+    @Singleton
+    public LoginUseCase provideLoginUseCase(IUserRepository userRepository) {
+        return new LoginUseCase(userRepository);
     }
 }
