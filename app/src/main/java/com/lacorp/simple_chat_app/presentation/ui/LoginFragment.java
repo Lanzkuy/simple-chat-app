@@ -73,8 +73,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             switch (userResource.status) {
                 case SUCCESS: {
                     progressBarOff();
-                    User user = userResource.data;
-                    if(user != null) {
+                    if(userResource.data != null) {
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container_view, HomeFragment.class, null)
                                 .commit();

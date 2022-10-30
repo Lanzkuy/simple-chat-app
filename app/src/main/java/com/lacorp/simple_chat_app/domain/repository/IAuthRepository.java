@@ -11,4 +11,6 @@ public interface IAuthRepository {
     Single<Resource<User>> login(String username, String password);
 
     Completable register(User user);
+
+    Single<Boolean> checkUsername(String username);
 }

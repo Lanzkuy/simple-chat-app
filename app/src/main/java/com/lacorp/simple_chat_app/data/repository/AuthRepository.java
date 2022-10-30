@@ -46,6 +46,14 @@ public class AuthRepository implements IAuthRepository {
     @Override
     public Completable register(User user) {
         return Completable.create(emitter -> {
+            boolean isAvailable = checkUsername(user.getUsername())
+                    .blockingGet();
+
+            if(!isAvailable) {
+                emitter.onError(new Exception("Username already exists"));
+                return;
+            }
+
             String newId = firestore.collection(USER_COLLECTION).document().getId();
             user.setUser_id(newId);
 
@@ -53,5 +61,19 @@ public class AuthRepository implements IAuthRepository {
                     .addOnSuccessListener(e -> emitter.onComplete())
                     .addOnFailureListener(emitter::onError);
         });
+    }
+
+    @Override
+    public Single<Boolean> checkUsername(String username) {
+        return Single.create(emitter -> firestore.collection(USER_COLLECTION)
+                .whereEqualTo("username", username)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(queryDocumentSnapshots.isEmpty()) {
+                        emitter.onSuccess(true);
+                    }
+                    else {
+                        emitter.onSuccess(false);
+                    }
+                }));
     }
 }

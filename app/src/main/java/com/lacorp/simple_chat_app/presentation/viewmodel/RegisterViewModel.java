@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.domain.usecase.AuthUseCase;
+import com.lacorp.simple_chat_app.domain.usecase.validator.ValidationResult;
 import com.lacorp.simple_chat_app.utils.Resource;
 
 import javax.inject.Inject;
@@ -21,16 +22,46 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class RegisterViewModel extends ViewModel {
 
     public MutableLiveData<Resource<Boolean>> registerUser = new MutableLiveData<>();
-    private final AuthUseCase registerUseCase;
+    private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     public RegisterViewModel(AuthUseCase registerUseCase) {
-        this.registerUseCase = registerUseCase;
+        this.authUseCase = registerUseCase;
     }
 
     public void registerUser(User user) {
-        registerUseCase.register(user).subscribeOn(Schedulers.io())
+        ValidationResult usernameValidation= authUseCase
+                .getValidatorUseCase()
+                .getValidateUsername()
+                .execute(user.getUsername(), false);
+
+        ValidationResult passwordValidation = authUseCase
+                .getValidatorUseCase()
+                .getValidatePassword()
+                .execute(user.getPassword(), false);
+
+        ValidationResult fullnameValidation = authUseCase
+                .getValidatorUseCase()
+                .getValidateFullname()
+                .execute(user.getFullname());
+
+        if(!usernameValidation.getSuccessful()) {
+            registerUser.postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            return;
+        }
+
+        if(!passwordValidation.getSuccessful()) {
+            registerUser.postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            return;
+        }
+
+        if(!fullnameValidation.getSuccessful()) {
+            registerUser.postValue(Resource.Failure(new IllegalArgumentException(fullnameValidation.getErrorMessage())));
+            return;
+        }
+
+        authUseCase.register(user).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
                     @Override

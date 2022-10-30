@@ -52,21 +52,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             String fullname = fragmentRegisterBinding.etFullname.getText().toString();
             User user = new User("", username, password, fullname);
 
-            if(username.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your username", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if(password.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your password", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if(fullname.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your fullname", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Register User")
                     .setPositiveButton("Confirm", (dialogInterface, i) -> registerViewModel.registerUser(user))
@@ -92,11 +77,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 case SUCCESS: {
                     progressBarOff();
                     if(booleanResource.data != null) {
-                        if(!booleanResource.data) {
-                            Toast.makeText(requireContext(), "Register failed", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-
                         Toast.makeText(requireContext(), "Register successfully", Toast.LENGTH_SHORT).show();
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container_view, LoginFragment.class, null)
@@ -106,7 +86,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 }
                 case FAILURE: {
                     progressBarOff();
-                    Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                    assert booleanResource.throwable != null;
+                    Toast.makeText(requireContext(), booleanResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case LOADING: {
