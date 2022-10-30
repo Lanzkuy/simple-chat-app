@@ -1,5 +1,6 @@
 package com.lacorp.simple_chat_app.presentation.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
-import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentLoginBinding;
 import com.lacorp.simple_chat_app.presentation.viewmodel.LoginViewModel;
 
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -28,6 +30,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private FragmentLoginBinding fragmentLoginBinding;
     private LoginViewModel loginViewModel;
+
+    @Inject
+    public SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -42,6 +48,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).hide();
+        checkSession();
         initializeComponent();
         handleState();
     }
@@ -63,7 +70,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void checkSession() {
+        String user_id = sharedPreferences.getString("user_id", null);
+        if(user_id != null) {
+            if(!user_id.isEmpty()) {
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_view, HomeFragment.class, null)
+                        .commit();
+            }
+        }
+    }
+
     private void initializeComponent() {
+        editor = sharedPreferences.edit();
         fragmentLoginBinding.btnLogin.setOnClickListener(this);
         fragmentLoginBinding.tvRegister.setOnClickListener(this);
     }
@@ -74,6 +93,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 case SUCCESS: {
                     progressBarOff();
                     if(userResource.data != null) {
+                        editor.putString("user_id", userResource.data.getUser_id());
+                        editor.apply();
+
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container_view, HomeFragment.class, null)
                                 .commit();
