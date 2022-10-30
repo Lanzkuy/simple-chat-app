@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lacorp.simple_chat_app.data.entities.User;
-import com.lacorp.simple_chat_app.domain.usecase.RegisterUseCase;
+import com.lacorp.simple_chat_app.domain.usecase.AuthUseCase;
 import com.lacorp.simple_chat_app.utils.Resource;
 
 import javax.inject.Inject;
@@ -21,16 +21,16 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class RegisterViewModel extends ViewModel {
 
     public MutableLiveData<Resource<Boolean>> registerUser = new MutableLiveData<>();
-    private final RegisterUseCase registerUseCase;
+    private final AuthUseCase registerUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
-    public RegisterViewModel(RegisterUseCase registerUseCase) {
+    public RegisterViewModel(AuthUseCase registerUseCase) {
         this.registerUseCase = registerUseCase;
     }
 
     public void registerUser(User user) {
-        registerUseCase.invoke(user).subscribeOn(Schedulers.io())
+        registerUseCase.register(user).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
                     @Override

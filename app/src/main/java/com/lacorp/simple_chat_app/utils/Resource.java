@@ -1,8 +1,5 @@
 package com.lacorp.simple_chat_app.utils;
 
-import com.google.android.gms.tasks.Task;
-import com.lacorp.simple_chat_app.data.entities.User;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

@@ -22,7 +22,7 @@ import com.lacorp.simple_chat_app.presentation.viewmodel.RegisterViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class RegisterFragment extends Fragment {
+public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     private FragmentRegisterBinding fragmentRegisterBinding;
     private RegisterViewModel registerViewModel;
@@ -43,8 +43,10 @@ public class RegisterFragment extends Fragment {
         handleState();
     }
 
-    private void initializeComponent() {
-        fragmentRegisterBinding.btnRegister.setOnClickListener(view -> {
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if(id == R.id.btnRegister) {
             String username = fragmentRegisterBinding.etUsername.getText().toString();
             String password = fragmentRegisterBinding.etPassword.getText().toString();
             String fullname = fragmentRegisterBinding.etFullname.getText().toString();
@@ -70,13 +72,18 @@ public class RegisterFragment extends Fragment {
                     .setPositiveButton("Confirm", (dialogInterface, i) -> registerViewModel.registerUser(user))
                     .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
                     .show();
-
-        });
-
-        fragmentRegisterBinding.tvLogin.setOnClickListener(view -> requireActivity()
+        }
+        else if(id == R.id.tvLogin) {
+            requireActivity()
                 .getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, LoginFragment.class, null)
-                .commit());
+                .commit();
+        }
+    }
+
+    private void initializeComponent() {
+        fragmentRegisterBinding.btnRegister.setOnClickListener(this);
+        fragmentRegisterBinding.tvLogin.setOnClickListener(this);
     }
 
     private void handleState() {

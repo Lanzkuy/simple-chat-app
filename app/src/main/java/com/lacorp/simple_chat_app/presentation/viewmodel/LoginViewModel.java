@@ -4,7 +4,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lacorp.simple_chat_app.data.entities.User;
-import com.lacorp.simple_chat_app.domain.usecase.LoginUseCase;
+import com.lacorp.simple_chat_app.domain.usecase.AuthUseCase;
+import com.lacorp.simple_chat_app.domain.usecase.validator.ValidationResult;
 import com.lacorp.simple_chat_app.utils.Resource;
 
 import javax.inject.Inject;
@@ -20,16 +21,36 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class LoginViewModel extends ViewModel {
 
     public MutableLiveData<Resource<User>> loggedInUser = new MutableLiveData<>();
-    private final LoginUseCase loginUseCase;
+    private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
-    public LoginViewModel(LoginUseCase loginUseCase) {
-        this.loginUseCase = loginUseCase;
+    public LoginViewModel(AuthUseCase authUseCase) {
+        this.authUseCase = authUseCase;
     }
 
     public void loginUser(String username, String password) {
-        loginUseCase.invoke(username, password).subscribeOn(Schedulers.io())
+        ValidationResult usernameValidation= authUseCase
+                .getValidatorUseCase()
+                .getValidateUsername()
+                .execute(username, true);
+
+        ValidationResult passwordValidation = authUseCase
+                .getValidatorUseCase()
+                .getValidatePassword()
+                .execute(password, true);
+
+        if(!usernameValidation.getSuccessful()) {
+            loggedInUser.postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            return;
+        }
+
+        if(!passwordValidation.getSuccessful()) {
+            loggedInUser.postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            return;
+        }
+
+        authUseCase.login(username, password).subscribeOn(Schedulers.io())
                 .subscribe(new SingleObserver<Resource<User>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {

@@ -24,7 +24,7 @@ import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private FragmentLoginBinding fragmentLoginBinding;
     private LoginViewModel loginViewModel;
@@ -46,28 +46,26 @@ public class LoginFragment extends Fragment {
         handleState();
     }
 
-    private void initializeComponent() {
-        fragmentLoginBinding.btnLogin.setOnClickListener(view -> {
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if(id == R.id.btnLogin) {
             String username = fragmentLoginBinding.etUsername.getText().toString();
             String password = fragmentLoginBinding.etPassword.getText().toString();
-
-            if(username.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your username", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if(password.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter your password", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             loginViewModel.loginUser(username, password);
-        });
+        }
 
-        fragmentLoginBinding.tvRegister.setOnClickListener(view -> requireActivity()
+        if(id == R.id.tvRegister) {
+            requireActivity()
                 .getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, RegisterFragment.class, null)
-                .commit());
+                .commit();
+        }
+    }
+
+    private void initializeComponent() {
+        fragmentLoginBinding.btnLogin.setOnClickListener(this);
+        fragmentLoginBinding.tvRegister.setOnClickListener(this);
     }
 
     private void handleState() {
@@ -77,11 +75,6 @@ public class LoginFragment extends Fragment {
                     progressBarOff();
                     User user = userResource.data;
                     if(user != null) {
-                        if(user.getUser_id() == null) {
-                            Toast.makeText(requireContext(), "Username or password was wrong", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container_view, HomeFragment.class, null)
                                 .commit();
@@ -90,7 +83,8 @@ public class LoginFragment extends Fragment {
                 }
                 case FAILURE: {
                     progressBarOff();
-                    Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                    assert userResource.throwable != null;
+                    Toast.makeText(requireContext(), userResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case LOADING: {
