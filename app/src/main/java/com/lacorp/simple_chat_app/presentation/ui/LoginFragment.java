@@ -93,9 +93,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 case SUCCESS: {
                     progressBarOff();
                     if(userResource.data != null) {
-                        editor.putString("user_id", userResource.data.getUser_id());
-                        editor.apply();
-
+                        editor.putString("user_id", userResource.data.getUser_id()).apply();
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container_view, HomeFragment.class, null)
                                 .commit();
