@@ -2,12 +2,7 @@ package com.lacorp.simple_chat_app.data.repository;
 
 import static com.lacorp.simple_chat_app.utils.Constants.USER_COLLECTION;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IUserRepository;
 import com.lacorp.simple_chat_app.utils.Resource;
@@ -17,8 +12,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.FlowableEmitter;
-import io.reactivex.rxjava3.core.FlowableOnSubscribe;
 import io.reactivex.rxjava3.core.Single;
 
 public class UserRepository implements IUserRepository {

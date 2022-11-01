@@ -22,7 +22,10 @@ import com.lacorp.simple_chat_app.databinding.FragmentChatBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatMessageAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.ChatViewModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -71,7 +74,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         int id = view.getId();
         if(id == R.id.btnSend) {
             String messageText = fragmentChatBinding.etMessage.getText().toString();
-            Message message = new Message(user_id, messageText);
+            SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss",
+                    Locale.getDefault());
+            Message message = new Message(user_id, messageText, new Date());
             chatViewModel.sendMessage(message, friend_id);
         }
     }

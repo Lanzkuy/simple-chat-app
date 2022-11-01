@@ -25,38 +25,35 @@ public class ChatRepository implements IChatRepository {
 
     @Override
     public Flowable<Resource<List<Message>>> getMessages(String user_id, String friend_id) {
-        return Flowable.create(emitter -> {
-            firestore.collection(CHATS_COLLECTION)
-                    .document(user_id+friend_id)
-                    .collection("messages")
-                    .addSnapshotListener((value, error) -> {
-                        if(error != null) {
-                            emitter.onError(new Exception("Something went wrong"));
-                            return;
-                        }
+        return Flowable.create(emitter -> firestore.collection(CHATS_COLLECTION)
+                .document(user_id+friend_id)
+                .collection("messages")
+                .orderBy("last_message_time")
+                .addSnapshotListener((value, error) -> {
+                    if(error != null) {
+                        emitter.onError(new Exception("Something went wrong"));
+                        return;
+                    }
 
-                        if (value == null) {
-                            emitter.onNext(Resource.Success(new ArrayList<>()));
-                            return;
-                        }
+                    if (value == null) {
+                        emitter.onNext(Resource.Success(new ArrayList<>()));
+                        return;
+                    }
 
-                        List<Message> messageList = value.toObjects(Message.class);
-                        emitter.onNext(Resource.Success(messageList));
-                    });
-        }, BackpressureStrategy.BUFFER);
+                    List<Message> messageList = value.toObjects(Message.class);
+                    emitter.onNext(Resource.Success(messageList));
+                }), BackpressureStrategy.BUFFER);
     }
 
     @Override
     public Completable sendMessage(Message message, String friend_id) {
-        return Completable.create(emitter -> {
-            firestore.collection(CHATS_COLLECTION)
-                    .document(message.getSender_id()+friend_id)
-                    .collection(MESSAGES_COLLECTION).document()
-                    .set(message)
-                    .addOnSuccessListener(e -> {
-                        emitter.onComplete();
-                    })
-                    .addOnFailureListener(emitter::onError);
-        });
+        return Completable.create(emitter -> firestore.collection(CHATS_COLLECTION)
+                .document(message.getSender_id()+friend_id)
+                .collection(MESSAGES_COLLECTION).document()
+                .set(message)
+                .addOnSuccessListener(e -> {
+                    emitter.onComplete();
+                })
+                .addOnFailureListener(emitter::onError));
     }
 }
