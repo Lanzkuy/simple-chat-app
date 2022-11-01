@@ -1,7 +1,5 @@
 package com.lacorp.simple_chat_app.domain.usecase.validator;
 
-import java.util.regex.Pattern;
-
 public class ValidateUsername {
 
     public ValidationResult execute(String username, boolean isLogin) {

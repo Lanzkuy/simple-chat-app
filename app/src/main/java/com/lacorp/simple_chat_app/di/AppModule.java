@@ -5,6 +5,8 @@ import static com.lacorp.simple_chat_app.utils.Constants.SHARED_PREFERENCE_NAME;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.lacorp.simple_chat_app.presentation.adapter.ChatRoomAdapter;
+
 import javax.inject.Singleton;
 
 import dagger.Module;

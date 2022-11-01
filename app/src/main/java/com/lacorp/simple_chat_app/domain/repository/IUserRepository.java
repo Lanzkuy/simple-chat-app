@@ -6,10 +6,11 @@ import com.lacorp.simple_chat_app.utils.Resource;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 public interface IUserRepository {
 
-    Flowable<Resource<List<User>>> getAllUsers();
+    Single<Resource<User>> getUser(String user_id);
 
-    Flowable<Resource<List<User>>> getAllUserFriends();
+    Flowable<Resource<List<User>>> getFriends(String user_id);
 }

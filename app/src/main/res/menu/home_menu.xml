@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menuAddFriend"
-        android:title="@string/text_add_friend"/>
+    <item android:id="@+id/menuMyInfo"
+        android:title="@string/text_my_info"
+        android:visible="false"/>
+    <item android:id="@+id/menuFriends"
+        android:title="@string/text_friend"/>
     <item android:id="@+id/menuLogout"
         android:title="@string/text_logout"/>
 </menu>

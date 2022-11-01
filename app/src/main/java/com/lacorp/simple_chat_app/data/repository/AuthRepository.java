@@ -3,10 +3,11 @@ package com.lacorp.simple_chat_app.data.repository;
 import static com.lacorp.simple_chat_app.utils.Constants.USER_COLLECTION;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IAuthRepository;
 import com.lacorp.simple_chat_app.utils.Resource;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -21,26 +22,23 @@ public class AuthRepository implements IAuthRepository {
 
     @Override
     public Single<Resource<User>> login(String username, String password) {
-        return Single.create(emitter -> {
-            Query querySnapshot = firestore.collection(USER_COLLECTION)
-                    .whereEqualTo("username", username)
-                    .whereEqualTo("password", password);
-            querySnapshot.addSnapshotListener((value, error) -> {
-                if(error != null) {
-                    emitter.onError(error);
-                }
+        return Single.create(emitter -> firestore.collection(USER_COLLECTION)
+                .whereEqualTo("username", username)
+                .whereEqualTo("password", password)
+                .get().addOnCompleteListener(task -> {
+                    if(!task.isSuccessful()) {
+                        emitter.onError(new Exception("Something went wrong"));
+                        return;
+                    }
 
-                if(value != null) {
-                    if(!value.isEmpty()) {
-                        User user = value.toObjects(User.class).get(0);
-                        emitter.onSuccess(Resource.Success(user));
+                    List<User> userList = task.getResult().toObjects(User.class);
+                    if(userList.isEmpty()) {
+                        emitter.onError(new Exception("Username or password was wrong"));
+                        return;
                     }
-                    else {
-                        emitter.onError(new IllegalArgumentException("Username or password was wrong"));
-                    }
-                }
-            });
-        });
+
+                    emitter.onSuccess(Resource.Success(userList.get(0)));
+                }));
     }
 
     @Override

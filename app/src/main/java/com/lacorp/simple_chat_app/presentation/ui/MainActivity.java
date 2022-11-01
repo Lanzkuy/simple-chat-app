@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import com.lacorp.simple_chat_app.R;
 import com.lacorp.simple_chat_app.databinding.ActivityMainBinding;
 
+import java.util.Objects;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
