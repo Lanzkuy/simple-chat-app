@@ -15,8 +15,8 @@
     </style>
     <style name="customActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="android:background">@color/primary_50</item>
-        <item name="titleTextColor">@color/custom_white</item>
         <item name="android:textColor">@color/custom_white</item>
+        <item name="android:textColorPrimary">@color/custom_white</item>
         <item name="actionOverflowMenuStyle">@style/customOverflowMenuStyle</item>
     </style>
     <style name="customOverflowMenuStyle" parent="Widget.MaterialComponents.PopupMenu.Overflow">

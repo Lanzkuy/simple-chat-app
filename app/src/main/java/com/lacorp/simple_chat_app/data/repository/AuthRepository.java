@@ -21,12 +21,13 @@ public class AuthRepository implements IAuthRepository {
         return firestore.collection(USER_COLLECTION)
                 .whereEqualTo("username", username)
                 .whereEqualTo("password", password);
-
     }
 
     @Override
     public Task<Void> register(User user) {
-        return firestore.collection(USER_COLLECTION).document().set(user);
+        String newId = firestore.collection(USER_COLLECTION).document().getId();
+        user.setUser_id(newId);
+        return firestore.collection(USER_COLLECTION).document(newId).set(user);
     }
 
     @Override

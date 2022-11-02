@@ -1,5 +1,7 @@
 package com.lacorp.simple_chat_app.domain.usecase;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.lacorp.simple_chat_app.data.entities.Message;
 import com.lacorp.simple_chat_app.domain.repository.IChatRepository;
 import com.lacorp.simple_chat_app.domain.usecase.validator.ValidatorUseCase;
@@ -8,9 +10,13 @@ import com.lacorp.simple_chat_app.utils.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleEmitter;
+import io.reactivex.rxjava3.core.SingleOnSubscribe;
 
 public class ChatUseCase {
 
@@ -45,8 +51,11 @@ public class ChatUseCase {
     }
 
     public Completable sendMessage(Message message, String friend_id) {
-        return Completable.create(emitter -> chatRepository.sendMessage(message,friend_id)
-                .addOnSuccessListener(e -> emitter.onComplete())
+        return Completable.create(emitter ->
+                chatRepository.sendMessage(message, message.getSender_id() + friend_id)
+                .addOnSuccessListener(e -> chatRepository.sendMessage(message, friend_id + message.getSender_id())
+                        .addOnSuccessListener(f -> emitter.onComplete())
+                        .addOnFailureListener(emitter::onError))
                 .addOnFailureListener(emitter::onError));
     }
 }

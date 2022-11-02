@@ -3,9 +3,15 @@ package com.lacorp.simple_chat_app.data.repository;
 import static com.lacorp.simple_chat_app.utils.Constants.CHATS_COLLECTION;
 import static com.lacorp.simple_chat_app.utils.Constants.MESSAGES_COLLECTION;
 
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.lacorp.simple_chat_app.data.entities.Message;
 import com.lacorp.simple_chat_app.domain.repository.IChatRepository;
 
@@ -25,9 +31,9 @@ public class ChatRepository implements IChatRepository {
     }
 
     @Override
-    public Task<Void> sendMessage(Message message, String friend_id) {
+    public Task<Void> sendMessage(Message message, String chat_id) {
         return firestore.collection(CHATS_COLLECTION)
-                .document(message.getSender_id() + friend_id)
+                .document(chat_id)
                 .collection(MESSAGES_COLLECTION).document().set(message);
     }
 }
