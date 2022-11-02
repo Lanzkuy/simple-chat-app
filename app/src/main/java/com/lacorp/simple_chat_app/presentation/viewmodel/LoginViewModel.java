@@ -20,7 +20,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class LoginViewModel extends ViewModel {
 
-    public MutableLiveData<Resource<User>> loggedInUser = new MutableLiveData<>();
+    private final MutableLiveData<Resource<User>> loginUser = new MutableLiveData<>();
     private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -41,12 +41,12 @@ public class LoginViewModel extends ViewModel {
                 .execute(password, true);
 
         if(!usernameValidation.getSuccessful()) {
-            loggedInUser.postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            observeLoginUser().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
             return;
         }
 
         if(!passwordValidation.getSuccessful()) {
-            loggedInUser.postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            observeLoginUser().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
             return;
         }
 
@@ -55,19 +55,31 @@ public class LoginViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        loggedInUser.postValue(Resource.Loading(new User()));
+                        observeLoginUser().postValue(Resource.Loading(new User()));
                     }
 
                     @Override
                     public void onSuccess(@NonNull Resource<User> userResource) {
                         assert userResource.data != null;
-                        loggedInUser.postValue(Resource.Success(userResource.data));
+                        observeLoginUser().postValue(Resource.Success(userResource.data));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        loggedInUser.postValue(Resource.Failure(e));
+                        observeLoginUser().postValue(Resource.Failure(e));
                     }
                 });
+    }
+
+    public MutableLiveData<Resource<User>> observeLoginUser() {
+        return loginUser;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if(disposable != null) {
+            disposable.dispose();
+        }
     }
 }

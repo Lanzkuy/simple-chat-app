@@ -50,7 +50,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         checkSession();
         initializeComponent();
-        handleState();
+        try {
+            observeLogin();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -87,31 +92,36 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         fragmentLoginBinding.tvRegister.setOnClickListener(this);
     }
 
-    private void handleState() {
-        loginViewModel.loggedInUser.observe(getViewLifecycleOwner(), userResource -> {
-            switch (userResource.status) {
-                case SUCCESS: {
-                    progressBarOff();
-                    if(userResource.data != null) {
-                        editor.putString("user_id", userResource.data.getUser_id()).apply();
-                        requireActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container_view, HomeFragment.class, null)
-                                .commit();
+    private void observeLogin() throws Exception {
+        try {
+            loginViewModel.observeLoginUser().observe(getViewLifecycleOwner(), userResource -> {
+                switch (userResource.status) {
+                    case SUCCESS: {
+                        progressBarOff();
+                        if(userResource.data != null) {
+                            editor.putString("user_id", userResource.data.getUser_id()).apply();
+                            requireActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container_view, HomeFragment.class, null)
+                                    .commit();
+                        }
+                        break;
                     }
-                    break;
+                    case FAILURE: {
+                        progressBarOff();
+                        assert userResource.throwable != null;
+                        Toast.makeText(requireContext(), userResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        progressBarOn();
+                        break;
+                    }
                 }
-                case FAILURE: {
-                    progressBarOff();
-                    assert userResource.throwable != null;
-                    Toast.makeText(requireContext(), userResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case LOADING: {
-                    progressBarOn();
-                    break;
-                }
-            }
-        });
+            });
+        }
+        catch (Exception ex) {
+            throw new Exception(ex);
+        }
     }
 
     private void progressBarOn() {

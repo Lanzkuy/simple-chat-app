@@ -1,12 +1,10 @@
 package com.lacorp.simple_chat_app.presentation.ui;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.MenuHost;
@@ -16,14 +14,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
@@ -61,10 +57,17 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
+        AppCompatActivity activity = (AppCompatActivity)requireActivity();
+        Objects.requireNonNull(activity.getSupportActionBar()).show();
+        Objects.requireNonNull(activity.getSupportActionBar()).setTitle("Chat App");
 
         initializeComponent();
-        handleState();
+        try {
+            observeGetFriends();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {
@@ -75,20 +78,6 @@ public class HomeFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if(menuItem.getItemId() == R.id.menuFriends) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Add Friend");
-
-                    final EditText inputUsername = new EditText(requireContext());
-                    inputUsername.setInputType(InputType.TYPE_CLASS_TEXT);
-                    builder.setView(inputUsername);
-
-                    builder.setPositiveButton("Add", (dialogInterface, i) -> dialogInterface.cancel());
-                    builder.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
-
-                    builder.show();
-                }
-
                 if(menuItem.getItemId() == R.id.menuLogout) {
                     editor.putString("user_id", "").apply();
                     requireActivity().getSupportFragmentManager().beginTransaction()
@@ -107,44 +96,49 @@ public class HomeFragment extends Fragment {
                 LinearLayoutManager.VERTICAL, false));
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void handleState() {
-        homeViewModel.friends.observe(getViewLifecycleOwner(), listResource -> {
-            switch (listResource.status) {
-                case SUCCESS: {
-                    if(listResource.data != null) {
-                        progressBarOff();
-                        List<User> userList = listResource.data;
-                        chatRoomAdapter = new ChatRoomAdapter(userList);
-                        chatRoomAdapter.setOnClickListener((view, position) -> {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("user_id", sharedPreferences.getString("user_id", null));
-                            bundle.putString("friend_id", userList.get(position).getUser_id());
-                            bundle.putString("friend_name", userList.get(position).getFullname());
+    private void observeGetFriends() throws Exception {
+        try {
+            homeViewModel.observeFriends().observe(getViewLifecycleOwner(), friendsResource -> {
+                switch (friendsResource.status) {
+                    case SUCCESS: {
+                        if(friendsResource.data != null) {
+                            progressBarOff();
+                            List<User> userList = friendsResource.data;
+                            chatRoomAdapter = new ChatRoomAdapter(userList);
+                            chatRoomAdapter.setOnClickListener((view, position) -> {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("user_id", sharedPreferences.getString("user_id", null));
+                                bundle.putString("friend_id", userList.get(position).getUser_id());
+                                bundle.putString("friend_name", userList.get(position).getFullname());
 
-                            ChatFragment chatFragment = new ChatFragment();
-                            chatFragment.setArguments(bundle);
+                                ChatFragment chatFragment = new ChatFragment();
+                                chatFragment.setArguments(bundle);
 
-                            requireActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container_view, chatFragment, "chat")
-                                    .commit();
-                        });
-                        fragmentHomeBinding.rvChatRoom.setAdapter(chatRoomAdapter);
+                                requireActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container_view, chatFragment, "chat")
+                                        .addToBackStack(null)
+                                        .commit();
+                            });
+                            fragmentHomeBinding.rvChatRoom.setAdapter(chatRoomAdapter);
+                        }
+                        break;
                     }
-                    break;
+                    case FAILURE: {
+                        progressBarOff();
+                        assert friendsResource.throwable != null;
+                        Toast.makeText(requireContext(), friendsResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        progressBarOn();
+                        break;
+                    }
                 }
-                case FAILURE: {
-                    progressBarOff();
-                    assert listResource.throwable != null;
-                    Toast.makeText(requireContext(), listResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case LOADING: {
-                    progressBarOn();
-                    break;
-                }
-            }
-        });
+            });
+        }
+        catch (Exception ex) {
+            throw new Exception();
+        }
     }
 
     private void progressBarOn() {

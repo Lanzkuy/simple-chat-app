@@ -4,7 +4,8 @@
         android:title="@string/text_my_info"
         android:visible="false"/>
     <item android:id="@+id/menuFriends"
-        android:title="@string/text_friend"/>
+        android:title="@string/text_friend"
+        android:visible="false"/>
     <item android:id="@+id/menuLogout"
         android:title="@string/text_logout"/>
 </menu>

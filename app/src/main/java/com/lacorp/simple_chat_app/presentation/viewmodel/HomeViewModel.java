@@ -23,7 +23,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class HomeViewModel extends ViewModel {
 
-    public MutableLiveData<Resource<List<User>>> friends = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<User>>> friends = new MutableLiveData<>();
     private final UserUseCase userUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -40,18 +40,18 @@ public class HomeViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        friends.postValue(Resource.Loading(new ArrayList<>()));
+                        observeFriends().postValue(Resource.Loading(new ArrayList<>()));
                     }
 
                     @Override
                     public void onNext(@NonNull Resource<List<User>> userResource) {
                         assert userResource.data != null;
-                        friends.postValue(Resource.Success(userResource.data));
+                        observeFriends().postValue(Resource.Success(userResource.data));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        friends.postValue(Resource.Failure(e));
+                        observeFriends().postValue(Resource.Failure(e));
                     }
 
                     @Override
@@ -59,5 +59,17 @@ public class HomeViewModel extends ViewModel {
 
                     }
                 });
+    }
+
+    public MutableLiveData<Resource<List<User>>> observeFriends() {
+        return friends;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if(disposable != null) {
+            disposable.dispose();
+        }
     }
 }

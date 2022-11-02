@@ -22,10 +22,8 @@ import com.lacorp.simple_chat_app.databinding.FragmentChatBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatMessageAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.ChatViewModel;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -66,7 +64,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 .getSupportActionBar()).setTitle(friend_name);
 
         initializeComponent();
-        handleState();
+        try {
+            observeMessages();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -74,10 +77,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         int id = view.getId();
         if(id == R.id.btnSend) {
             String messageText = fragmentChatBinding.etMessage.getText().toString();
-            SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss",
-                    Locale.getDefault());
             Message message = new Message(user_id, messageText, new Date());
             chatViewModel.sendMessage(message, friend_id);
+
+            chatViewModel.observeSendMessage().observe(getViewLifecycleOwner(), messageResource -> {
+                switch (messageResource.status) {
+                    case SUCCESS: {
+                        if(messageResource.data != null) {
+                            fragmentChatBinding.etMessage.setText("");
+                            fragmentChatBinding.rvMessages.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
+                        }
+                        break;
+                    }
+                    case FAILURE: {
+                        assert messageResource.throwable != null;
+                        Toast.makeText(requireContext(), messageResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        break;
+                    }
+                }
+            });
         }
     }
 
@@ -88,30 +109,36 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 LinearLayoutManager.VERTICAL, false));
     }
 
-    private void handleState() {
-        chatViewModel.getMessages.observe(getViewLifecycleOwner(), listResource -> {
-            switch (listResource.status) {
-                case SUCCESS: {
-                    if(listResource.data != null) {
-                        progressBarOff();
-                        List<Message> messageList = listResource.data;
-                        chatMessageAdapter = new ChatMessageAdapter(messageList, sharedPreferences.getString("user_id", null));
-                        fragmentChatBinding.rvMessages.setAdapter(chatMessageAdapter);
+    private void observeMessages() throws Exception {
+        try {
+            chatViewModel.observeGetMessages().observe(getViewLifecycleOwner(), messageResource -> {
+                switch (messageResource.status) {
+                    case SUCCESS: {
+                        if(messageResource.data != null) {
+                            progressBarOff();
+                            List<Message> messageList = messageResource.data;
+                            chatMessageAdapter = new ChatMessageAdapter(messageList, sharedPreferences.getString("user_id", null));
+                            fragmentChatBinding.rvMessages.setAdapter(chatMessageAdapter);
+                            fragmentChatBinding.rvMessages.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
+                        }
+                        break;
                     }
-                    break;
+                    case FAILURE: {
+                        progressBarOff();
+                        assert messageResource.throwable != null;
+                        Toast.makeText(requireContext(), messageResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        progressBarOn();
+                        break;
+                    }
                 }
-                case FAILURE: {
-                    progressBarOff();
-                    assert listResource.throwable != null;
-                    Toast.makeText(requireContext(), listResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case LOADING: {
-                    progressBarOn();
-                    break;
-                }
-            }
-        });
+            });
+        }
+        catch (Exception ex) {
+            throw new Exception();
+        }
     }
 
     private void progressBarOn() {

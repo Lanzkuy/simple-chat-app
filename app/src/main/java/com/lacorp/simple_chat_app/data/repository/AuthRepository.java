@@ -2,15 +2,11 @@ package com.lacorp.simple_chat_app.data.repository;
 
 import static com.lacorp.simple_chat_app.utils.Constants.USER_COLLECTION;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.lacorp.simple_chat_app.data.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IAuthRepository;
-import com.lacorp.simple_chat_app.utils.Resource;
-
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
 
 public class AuthRepository implements IAuthRepository {
 
@@ -21,57 +17,21 @@ public class AuthRepository implements IAuthRepository {
     }
 
     @Override
-    public Single<Resource<User>> login(String username, String password) {
-        return Single.create(emitter -> firestore.collection(USER_COLLECTION)
+    public Query login(String username, String password) {
+        return firestore.collection(USER_COLLECTION)
                 .whereEqualTo("username", username)
-                .whereEqualTo("password", password)
-                .get().addOnCompleteListener(task -> {
-                    if(!task.isSuccessful()) {
-                        emitter.onError(new Exception("Something went wrong"));
-                        return;
-                    }
+                .whereEqualTo("password", password);
 
-                    List<User> userList = task.getResult().toObjects(User.class);
-                    if(userList.isEmpty()) {
-                        emitter.onError(new Exception("Username or password was wrong"));
-                        return;
-                    }
-
-                    emitter.onSuccess(Resource.Success(userList.get(0)));
-                }));
     }
 
     @Override
-    public Completable register(User user) {
-        return Completable.create(emitter -> {
-            boolean isAvailable = checkUsername(user.getUsername())
-                    .blockingGet();
-
-            if(!isAvailable) {
-                emitter.onError(new Exception("Username already exists"));
-                return;
-            }
-
-            String newId = firestore.collection(USER_COLLECTION).document().getId();
-            user.setUser_id(newId);
-
-            firestore.collection(USER_COLLECTION).document(newId).set(user)
-                    .addOnSuccessListener(e -> emitter.onComplete())
-                    .addOnFailureListener(emitter::onError);
-        });
+    public Task<Void> register(User user) {
+        return firestore.collection(USER_COLLECTION).document().set(user);
     }
 
     @Override
-    public Single<Boolean> checkUsername(String username) {
-        return Single.create(emitter -> firestore.collection(USER_COLLECTION)
-                .whereEqualTo("username", username)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if(queryDocumentSnapshots.isEmpty()) {
-                        emitter.onSuccess(true);
-                    }
-                    else {
-                        emitter.onSuccess(false);
-                    }
-                }));
+    public Query checkUsername(String username) {
+        return firestore.collection(USER_COLLECTION)
+                .whereEqualTo("username", username);
     }
 }

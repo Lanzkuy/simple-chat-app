@@ -21,7 +21,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class RegisterViewModel extends ViewModel {
 
-    public MutableLiveData<Resource<Boolean>> registerUser = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Boolean>> registerUser = new MutableLiveData<>();
     private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -47,17 +47,17 @@ public class RegisterViewModel extends ViewModel {
                 .execute(user.getFullname());
 
         if(!usernameValidation.getSuccessful()) {
-            registerUser.postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
             return;
         }
 
         if(!passwordValidation.getSuccessful()) {
-            registerUser.postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
             return;
         }
 
         if(!fullnameValidation.getSuccessful()) {
-            registerUser.postValue(Resource.Failure(new IllegalArgumentException(fullnameValidation.getErrorMessage())));
+            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(fullnameValidation.getErrorMessage())));
             return;
         }
 
@@ -67,18 +67,30 @@ public class RegisterViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        registerUser.postValue(Resource.Loading(true));
+                        observeRegisterUser().postValue(Resource.Loading(true));
                     }
 
                     @Override
                     public void onComplete() {
-                        registerUser.postValue(Resource.Success(true));
+                        observeRegisterUser().postValue(Resource.Success(true));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        registerUser.postValue(Resource.Failure(e));
+                        observeRegisterUser().postValue(Resource.Failure(e));
                     }
                 });
+    }
+
+    public MutableLiveData<Resource<Boolean>> observeRegisterUser() {
+        return registerUser;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if(disposable != null) {
+            disposable.dispose();
+        }
     }
 }

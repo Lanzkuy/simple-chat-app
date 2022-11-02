@@ -1,16 +1,14 @@
 package com.lacorp.simple_chat_app.domain.repository;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.Query;
 import com.lacorp.simple_chat_app.data.entities.User;
-import com.lacorp.simple_chat_app.utils.Resource;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
 
 public interface IAuthRepository {
 
-    Single<Resource<User>> login(String username, String password);
+    Query login(String username, String password);
 
-    Completable register(User user);
+    Task<Void> register(User user);
 
-    Single<Boolean> checkUsername(String username);
+    Query checkUsername(String username);
 }

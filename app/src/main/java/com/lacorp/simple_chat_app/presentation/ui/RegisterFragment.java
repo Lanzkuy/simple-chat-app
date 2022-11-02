@@ -40,7 +40,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         initializeComponent();
-        handleState();
+        try {
+            observeRegister();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -71,31 +76,36 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         fragmentRegisterBinding.tvLogin.setOnClickListener(this);
     }
 
-    private void handleState() {
-        registerViewModel.registerUser.observe(getViewLifecycleOwner(), booleanResource -> {
-            switch (booleanResource.status) {
-                case SUCCESS: {
-                    progressBarOff();
-                    if(booleanResource.data != null) {
-                        Toast.makeText(requireContext(), "Register successfully", Toast.LENGTH_SHORT).show();
-                        requireActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container_view, LoginFragment.class, null)
-                                .commit();
+    private void observeRegister() throws Exception {
+        try {
+            registerViewModel.observeRegisterUser().observe(getViewLifecycleOwner(), registerResource -> {
+                switch (registerResource.status) {
+                    case SUCCESS: {
+                        progressBarOff();
+                        if(registerResource.data != null) {
+                            Toast.makeText(requireContext(), "Register successfully", Toast.LENGTH_SHORT).show();
+                            requireActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container_view, LoginFragment.class, null)
+                                    .commit();
+                        }
+                        break;
                     }
-                    break;
+                    case FAILURE: {
+                        progressBarOff();
+                        assert registerResource.throwable != null;
+                        Toast.makeText(requireContext(), registerResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        progressBarOn();
+                        break;
+                    }
                 }
-                case FAILURE: {
-                    progressBarOff();
-                    assert booleanResource.throwable != null;
-                    Toast.makeText(requireContext(), booleanResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case LOADING: {
-                    progressBarOn();
-                    break;
-                }
-            }
-        });
+            });
+        }
+        catch (Exception ex) {
+            throw new Exception();
+        }
     }
 
     private void progressBarOn() {

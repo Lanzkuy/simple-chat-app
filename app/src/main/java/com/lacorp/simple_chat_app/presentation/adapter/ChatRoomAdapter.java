@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ViewHolder> {
 
-    private List<User> userList;
+    private final List<User> userList;
     private ItemClickListener itemClickListener;
 
     public ChatRoomAdapter(List<User> userList) {
