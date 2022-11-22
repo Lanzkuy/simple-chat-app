@@ -1,6 +1,6 @@
 package com.lacorp.simple_chat_app.domain.usecase;
 
-import com.lacorp.simple_chat_app.data.entities.User;
+import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IAuthRepository;
 import com.lacorp.simple_chat_app.domain.usecase.validator.ValidatorUseCase;
 import com.lacorp.simple_chat_app.utils.Resource;

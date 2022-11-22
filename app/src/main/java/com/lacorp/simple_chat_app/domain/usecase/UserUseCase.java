@@ -1,6 +1,6 @@
 package com.lacorp.simple_chat_app.domain.usecase;
 
-import com.lacorp.simple_chat_app.data.entities.User;
+import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IUserRepository;
 import com.lacorp.simple_chat_app.domain.usecase.validator.ValidatorUseCase;
 import com.lacorp.simple_chat_app.utils.Resource;
@@ -15,15 +15,9 @@ import io.reactivex.rxjava3.core.Single;
 public class UserUseCase {
 
     private final IUserRepository userRepository;
-    private final ValidatorUseCase validatorUseCase;
 
-    public UserUseCase(IUserRepository userRepository, ValidatorUseCase validatorUseCase) {
+    public UserUseCase(IUserRepository userRepository) {
         this.userRepository = userRepository;
-        this.validatorUseCase = validatorUseCase;
-    }
-
-    public ValidatorUseCase getValidatorUseCase() {
-        return validatorUseCase;
     }
 
     public Single<Resource<User>> getUser(String user_id) {

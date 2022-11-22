@@ -3,7 +3,7 @@ package com.lacorp.simple_chat_app.presentation.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.lacorp.simple_chat_app.data.entities.Message;
+import com.lacorp.simple_chat_app.domain.entities.Message;
 import com.lacorp.simple_chat_app.domain.usecase.ChatUseCase;
 import com.lacorp.simple_chat_app.utils.Resource;
 

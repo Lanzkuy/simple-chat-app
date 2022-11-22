@@ -1,4 +1,4 @@
-package com.lacorp.simple_chat_app.data.entities;
+package com.lacorp.simple_chat_app.domain.entities;
 
 import java.util.Date;
 

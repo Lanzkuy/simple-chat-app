@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lacorp.simple_chat_app.data.entities.Message;
+import com.lacorp.simple_chat_app.domain.entities.Message;
 import com.lacorp.simple_chat_app.databinding.ItemMessageReceiveBinding;
 import com.lacorp.simple_chat_app.databinding.ItemMessageSentBinding;
 

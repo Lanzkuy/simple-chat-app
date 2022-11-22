@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
-import com.lacorp.simple_chat_app.data.entities.User;
+import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentHomeBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatRoomAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.HomeViewModel;

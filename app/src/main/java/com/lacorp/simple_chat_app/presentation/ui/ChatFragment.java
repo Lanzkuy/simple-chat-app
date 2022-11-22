@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
-import com.lacorp.simple_chat_app.data.entities.Message;
+import com.lacorp.simple_chat_app.domain.entities.Message;
 import com.lacorp.simple_chat_app.databinding.FragmentChatBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatMessageAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.ChatViewModel;
@@ -83,8 +83,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             chatViewModel.observeSendMessage().observe(getViewLifecycleOwner(), messageResource -> {
                 switch (messageResource.status) {
                     case SUCCESS: {
+                        fragmentChatBinding.etMessage.setText("");
                         if(messageResource.data != null) {
-                            fragmentChatBinding.etMessage.setText("");
                             fragmentChatBinding.rvMessages.scrollToPosition(chatMessageAdapter.getItemCount() - 1);
                         }
                         break;

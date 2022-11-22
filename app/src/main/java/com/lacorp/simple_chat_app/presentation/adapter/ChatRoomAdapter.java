@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lacorp.simple_chat_app.data.entities.User;
+import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.ItemChatRoomBinding;
 
 import java.util.List;

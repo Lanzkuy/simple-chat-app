@@ -40,13 +40,13 @@ public class UseCaseModule {
 
     @Provides
     @Singleton
-    public UserUseCase provideUserUseCase(IUserRepository userRepository, ValidatorUseCase validatorUseCase) {
-        return new UserUseCase(userRepository, validatorUseCase);
+    public UserUseCase provideUserUseCase(IUserRepository userRepository) {
+        return new UserUseCase(userRepository);
     }
 
     @Provides
     @Singleton
-    public ChatUseCase provideChatUseCase(IChatRepository chatRepository, ValidatorUseCase validatorUseCase) {
-        return new ChatUseCase(chatRepository, validatorUseCase);
+    public ChatUseCase provideChatUseCase(IChatRepository chatRepository) {
+        return new ChatUseCase(chatRepository);
     }
 }
