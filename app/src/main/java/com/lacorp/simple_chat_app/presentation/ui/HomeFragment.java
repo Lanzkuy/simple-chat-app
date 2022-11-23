@@ -1,10 +1,12 @@
 package com.lacorp.simple_chat_app.presentation.ui;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.MenuHost;
@@ -14,15 +16,18 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
+import com.lacorp.simple_chat_app.domain.entities.Friend;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentHomeBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatRoomAdapter;
@@ -64,6 +69,7 @@ public class HomeFragment extends Fragment {
         initializeComponent();
         try {
             observeGetFriends();
+            observeAddFriendStatus();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +84,26 @@ public class HomeFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if(menuItem.getItemId() == R.id.menuLogout) {
+                if(menuItem.getItemId() == R.id.menuAddFriends) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setTitle("Add Friend");
+
+                    final EditText etUsername = new EditText(requireContext());
+                    etUsername.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(etUsername);
+
+                    builder.setPositiveButton("Ok", (dialogInterface, i) -> {
+                        homeViewModel.addFriend(sharedPreferences.getString("user_id", null)
+                                , etUsername.getText().toString());
+                    }).show();
+                }
+                else if(menuItem.getItemId() == R.id.menuFriendRequests) {
+                    requireActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, FriendRequestFragment.class, null)
+                            .addToBackStack(null)
+                            .commit();
+                }
+                else if(menuItem.getItemId() == R.id.menuLogout) {
                     editor.putString("user_id", "").apply();
                     requireActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container_view, LoginFragment.class, null)
@@ -101,21 +126,21 @@ public class HomeFragment extends Fragment {
             homeViewModel.observeFriends().observe(getViewLifecycleOwner(), friendsResource -> {
                 switch (friendsResource.status) {
                     case SUCCESS: {
+                        progressBarOff();
                         if(friendsResource.data != null) {
-                            progressBarOff();
-                            List<User> userList = friendsResource.data;
-                            chatRoomAdapter = new ChatRoomAdapter(userList);
+                            List<Friend> friendList = friendsResource.data;
+                            chatRoomAdapter = new ChatRoomAdapter(friendList);
                             chatRoomAdapter.setOnClickListener((view, position) -> {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("user_id", sharedPreferences.getString("user_id", null));
-                                bundle.putString("friend_id", userList.get(position).getUser_id());
-                                bundle.putString("friend_name", userList.get(position).getFullname());
+                                bundle.putString("friend_id", friendList.get(position).getUser_id());
+                                bundle.putString("friend_name", friendList.get(position).getFullname());
 
                                 ChatFragment chatFragment = new ChatFragment();
                                 chatFragment.setArguments(bundle);
 
                                 requireActivity().getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragment_container_view, chatFragment, "chat")
+                                        .replace(R.id.fragment_container_view, chatFragment, null)
                                         .addToBackStack(null)
                                         .commit();
                             });
@@ -127,6 +152,35 @@ public class HomeFragment extends Fragment {
                         progressBarOff();
                         assert friendsResource.throwable != null;
                         Toast.makeText(requireContext(), friendsResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case LOADING: {
+                        progressBarOn();
+                        break;
+                    }
+                }
+            });
+        }
+        catch (Exception ex) {
+            throw new Exception();
+        }
+    }
+
+    private void observeAddFriendStatus() throws Exception {
+        try {
+            homeViewModel.observeAddFriendsStatus().observe(getViewLifecycleOwner(), addFriendStatusResource -> {
+                switch (addFriendStatusResource.status) {
+                    case SUCCESS: {
+                        progressBarOff();
+                        if(addFriendStatusResource.data != null) {
+                            Toast.makeText(requireContext(), "Friend request sent", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    }
+                    case FAILURE: {
+                        progressBarOff();
+                        assert addFriendStatusResource.throwable != null;
+                        Toast.makeText(requireContext(), addFriendStatusResource.throwable.getMessage(), Toast.LENGTH_SHORT).show();
                         break;
                     }
                     case LOADING: {

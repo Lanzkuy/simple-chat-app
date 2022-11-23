@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lacorp.simple_chat_app.domain.entities.Friend;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.ItemChatRoomBinding;
 
@@ -15,11 +16,11 @@ import java.util.List;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ViewHolder> {
 
-    private final List<User> userList;
+    private final List<Friend> friendList;
     private ItemClickListener itemClickListener;
 
-    public ChatRoomAdapter(List<User> userList) {
-        this.userList = userList;
+    public ChatRoomAdapter(List<Friend> friendList) {
+        this.friendList = friendList;
     }
 
     public interface ItemClickListener {
@@ -54,13 +55,13 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        User user = userList.get(position);
-        holder.tvUsername.setText(user.getFullname());
+        Friend friend = friendList.get(position);
+        holder.tvUsername.setText(friend.getFullname());
     }
 
     @Override
     public int getItemCount() {
-        return userList.size();
+        return friendList.size();
     }
 
     public void setOnClickListener(ItemClickListener itemClickListener) {

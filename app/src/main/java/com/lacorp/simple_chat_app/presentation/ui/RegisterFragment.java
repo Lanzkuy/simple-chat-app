@@ -15,9 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
+import com.lacorp.simple_chat_app.domain.entities.Friend;
+import com.lacorp.simple_chat_app.domain.entities.FriendRequest;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentRegisterBinding;
 import com.lacorp.simple_chat_app.presentation.viewmodel.RegisterViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -55,11 +60,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             String username = fragmentRegisterBinding.etUsername.getText().toString();
             String password = fragmentRegisterBinding.etPassword.getText().toString();
             String fullname = fragmentRegisterBinding.etFullname.getText().toString();
-            User user = new User("", username, password, fullname);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Register User")
-                    .setPositiveButton("Confirm", (dialogInterface, i) -> registerViewModel.registerUser(user))
+                    .setPositiveButton("Confirm", (dialogInterface, i) ->
+                            registerViewModel.registerUser(new User("", username, password, fullname)))
                     .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
                     .show();
         }

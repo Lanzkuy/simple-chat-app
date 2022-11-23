@@ -3,9 +3,10 @@
     <item android:id="@+id/menuMyInfo"
         android:title="@string/text_my_info"
         android:visible="false"/>
-    <item android:id="@+id/menuFriends"
-        android:title="@string/text_friend"
-        android:visible="false"/>
+    <item android:id="@+id/menuAddFriends"
+        android:title="@string/text_add_friend"/>
+    <item android:id="@+id/menuFriendRequests"
+        android:title="@string/text_friend_requests"/>
     <item android:id="@+id/menuLogout"
         android:title="@string/text_logout"/>
 </menu>

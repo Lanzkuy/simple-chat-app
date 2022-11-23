@@ -3,6 +3,7 @@ package com.lacorp.simple_chat_app.presentation.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.lacorp.simple_chat_app.domain.entities.Friend;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.domain.usecase.UserUseCase;
 import com.lacorp.simple_chat_app.utils.Resource;
@@ -15,7 +16,10 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.CompletableObserver;
 import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -23,7 +27,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class HomeViewModel extends ViewModel {
 
-    private final MutableLiveData<Resource<List<User>>> friends = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Friend>>> friends = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Boolean>> addFriendStatus = new MutableLiveData<>();
     private final UserUseCase userUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -32,11 +37,33 @@ public class HomeViewModel extends ViewModel {
         this.userUseCase = userUseCase;
     }
 
+    public void addFriend(String user_id, String friend_username) {
+        userUseCase.addFriend(user_id, friend_username).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        disposable.add(d);
+                        observeAddFriendsStatus().postValue(Resource.Loading(true));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        observeAddFriendsStatus().postValue(Resource.Success(true));
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        observeAddFriendsStatus().postValue(Resource.Failure(e));
+                    }
+                });
+    }
+
     public void getFriends(String user_id) {
         userUseCase.getFriends(user_id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toObservable()
-                .subscribe(new Observer<Resource<List<User>>>() {
+                .subscribe(new Observer<Resource<List<Friend>>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
@@ -44,9 +71,9 @@ public class HomeViewModel extends ViewModel {
                     }
 
                     @Override
-                    public void onNext(@NonNull Resource<List<User>> userResource) {
-                        assert userResource.data != null;
-                        observeFriends().postValue(Resource.Success(userResource.data));
+                    public void onNext(@NonNull Resource<List<Friend>> friendResource) {
+                        assert friendResource.data != null;
+                        observeFriends().postValue(Resource.Success(friendResource.data));
                     }
 
                     @Override
@@ -61,8 +88,12 @@ public class HomeViewModel extends ViewModel {
                 });
     }
 
-    public MutableLiveData<Resource<List<User>>> observeFriends() {
+    public MutableLiveData<Resource<List<Friend>>> observeFriends() {
         return friends;
+    }
+
+    public MutableLiveData<Resource<Boolean>> observeAddFriendsStatus() {
+        return addFriendStatus;
     }
 
     @Override

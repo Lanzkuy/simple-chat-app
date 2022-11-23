@@ -12,6 +12,9 @@
     <string name="text_dont_have_account">Dont have an account?</string>
     <string name="text_last_message">Last Message</string>
     <string name="text_friend">Friends</string>
+    <string name="text_friend_requests">Friend Requests</string>
+    <string name="text_add_friend">Add Friend</string>
+    <string name="text_accept">Accept</string>
     <string name="text_my_info">My Info</string>
     <string name="text_send">Send</string>
     <string name="text_type_message">Type message here</string>
