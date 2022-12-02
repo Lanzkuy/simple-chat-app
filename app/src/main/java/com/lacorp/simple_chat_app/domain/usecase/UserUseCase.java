@@ -74,8 +74,14 @@ public class UserUseCase {
 
             assert userRequest != null;
             assert userResponse != null;
+
+            if(userRequest.getUser_id().equals(userResponse.getUser_id())) {
+                emitter.onError(new Exception("You can't add yourself"));
+                return;
+            }
+
             userRepository.addFriend(userResponse.getUser_id(),
-                    new FriendRequest("", userRequest.getUser_id(), userRequest.getUsername()))
+                            new FriendRequest("", userRequest.getUser_id(), userRequest.getUsername()))
                     .addOnSuccessListener(e -> emitter.onComplete())
                     .addOnFailureListener(emitter::onError);
         });

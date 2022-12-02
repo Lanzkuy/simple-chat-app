@@ -145,6 +145,7 @@ public class HomeFragment extends Fragment {
                                         .commit();
                             });
                             fragmentHomeBinding.rvChatRoom.setAdapter(chatRoomAdapter);
+                            fragmentHomeBinding.rvChatRoom.scrollToPosition(chatRoomAdapter.getItemCount() - 1);
                         }
                         break;
                     }
