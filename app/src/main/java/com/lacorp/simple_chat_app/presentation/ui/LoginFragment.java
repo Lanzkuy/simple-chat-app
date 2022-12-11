@@ -71,6 +71,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             requireActivity()
                 .getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, RegisterFragment.class, null)
+                .addToBackStack(null)
                 .commit();
         }
     }

@@ -35,10 +35,11 @@ public class ChatViewModel extends ViewModel {
     }
 
     public void getMessages(String user_id, String friend_id) {
-        chatUseCase.getMessages(user_id, friend_id).subscribeOn(Schedulers.io())
+        chatUseCase.getMessages(user_id, friend_id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .toObservable().
-                subscribe(new Observer<Resource<List<Message>>>() {
+                .toObservable()
+                .subscribe(new Observer<Resource<List<Message>>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
@@ -67,7 +68,8 @@ public class ChatViewModel extends ViewModel {
             return;
         }
 
-        chatUseCase.sendMessage(message, friend_id).subscribeOn(Schedulers.io())
+        chatUseCase.sendMessage(message, friend_id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
                     @Override

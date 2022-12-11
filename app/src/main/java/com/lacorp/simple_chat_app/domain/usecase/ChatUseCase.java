@@ -21,7 +21,8 @@ public class ChatUseCase {
     }
 
     public Flowable<Resource<List<Message>>> getMessages(String user_id, String friend_id) {
-        return Flowable.create(emitter -> chatRepository.getMessages(user_id, friend_id)
+        return Flowable.create(emitter -> chatRepository
+                .getMessages(user_id, friend_id)
                 .addSnapshotListener((value, error) -> {
                     if(error != null) {
                         emitter.onError(new Exception("Something went wrong"));
@@ -39,9 +40,10 @@ public class ChatUseCase {
     }
 
     public Completable sendMessage(Message message, String friend_id) {
-        return Completable.create(emitter ->
-                chatRepository.sendMessage(message, message.getSender_id() + friend_id)
-                .addOnSuccessListener(e -> chatRepository.sendMessage(message, friend_id + message.getSender_id())
+        return Completable.create(emitter -> chatRepository
+                .sendMessage(message, message.getSender_id() + friend_id)
+                .addOnSuccessListener(e -> chatRepository
+                        .sendMessage(message, friend_id + message.getSender_id())
                         .addOnSuccessListener(f -> emitter.onComplete())
                         .addOnFailureListener(emitter::onError))
                 .addOnFailureListener(emitter::onError));

@@ -4,10 +4,13 @@
 
     <string name="text_username">Username</string>
     <string name="text_password">Password</string>
+    <string name="text_old_password">Old Password</string>
+    <string name="text_new_password">New Password</string>
     <string name="text_fullname">Fullname</string>
     <string name="text_login">Login</string>
     <string name="text_logout">Logout</string>
     <string name="text_register">Register</string>
+    <string name="text_submit">Submit</string>
     <string name="text_have_account">Have an account already?</string>
     <string name="text_dont_have_account">Dont have an account?</string>
     <string name="text_last_message">Last Message</string>
@@ -15,7 +18,7 @@
     <string name="text_friend_requests">Friend Requests</string>
     <string name="text_add_friend">Add Friend</string>
     <string name="text_accept">Accept</string>
-    <string name="text_my_info">My Info</string>
+    <string name="text_change_password">Change Password</string>
     <string name="text_send">Send</string>
     <string name="text_type_message">Type message here</string>
     <string name="text_sent_message">Sent Message</string>

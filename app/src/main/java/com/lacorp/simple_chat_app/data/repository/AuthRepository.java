@@ -25,9 +25,12 @@ public class AuthRepository implements IAuthRepository {
 
     @Override
     public Task<Void> register(User user) {
-        String newId = firestore.collection(USER_COLLECTION).document().getId();
+        String newId = firestore.collection(USER_COLLECTION)
+                .document().getId();
         user.setUser_id(newId);
-        return firestore.collection(USER_COLLECTION).document(newId).set(user);
+
+        return firestore.collection(USER_COLLECTION)
+                .document(newId).set(user);
     }
 
     @Override

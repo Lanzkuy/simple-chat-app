@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menuMyInfo"
-        android:title="@string/text_my_info"
-        android:visible="false"/>
+    <item android:id="@+id/menuChangePassword"
+        android:title="@string/text_change_password"/>
     <item android:id="@+id/menuAddFriends"
         android:title="@string/text_add_friend"/>
     <item android:id="@+id/menuFriendRequests"

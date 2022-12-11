@@ -84,7 +84,13 @@ public class HomeFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if(menuItem.getItemId() == R.id.menuAddFriends) {
+                if(menuItem.getItemId() == R.id.menuChangePassword) {
+                    requireActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_view, ChangePasswordFragment.class, null)
+                            .addToBackStack(null)
+                            .commit();
+                }
+                else if(menuItem.getItemId() == R.id.menuAddFriends) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                     builder.setTitle("Add Friend");
 

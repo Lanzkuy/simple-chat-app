@@ -32,7 +32,8 @@ public class UserUseCase {
     }
 
     public Single<Resource<User>> getUserByID(String user_id) {
-        return Single.create(emitter -> userRepository.getUserByID(user_id)
+        return Single.create(emitter -> userRepository
+                .getUserByID(user_id)
                 .get().addOnCompleteListener(task -> {
                     if(!task.isSuccessful()) {
                         emitter.onError(new Exception("Something went wrong"));
@@ -50,7 +51,8 @@ public class UserUseCase {
     }
 
     public Single<Resource<User>> getUserByUsername(String username) {
-        return Single.create(emitter -> userRepository.getUserByUsername(username)
+        return Single.create(emitter -> userRepository
+                .getUserByUsername(username)
                 .get().addOnCompleteListener(task -> {
                     if(!task.isSuccessful()) {
                         emitter.onError(new Exception("Something went wrong"));
@@ -67,28 +69,9 @@ public class UserUseCase {
                 }));
     }
 
-    public Completable addFriend(String user_id, String friend_username) {
-        return Completable.create(emitter -> {
-            User userRequest = getUserByID(user_id).blockingGet().data;
-            User userResponse = getUserByUsername(friend_username).blockingGet().data;
-
-            assert userRequest != null;
-            assert userResponse != null;
-
-            if(userRequest.getUser_id().equals(userResponse.getUser_id())) {
-                emitter.onError(new Exception("You can't add yourself"));
-                return;
-            }
-
-            userRepository.addFriend(userResponse.getUser_id(),
-                            new FriendRequest("", userRequest.getUser_id(), userRequest.getUsername()))
-                    .addOnSuccessListener(e -> emitter.onComplete())
-                    .addOnFailureListener(emitter::onError);
-        });
-    }
-
     public Flowable<Resource<List<Friend>>> getFriends(String user_id) {
-        return Flowable.create(emitter -> userRepository.getFriends(user_id)
+        return Flowable.create(emitter -> userRepository
+                .getFriends(user_id)
                 .get().addOnCompleteListener(task -> {
                     if(!task.isSuccessful()) {
                         emitter.onError(new Exception("Something went wrong"));
@@ -105,20 +88,9 @@ public class UserUseCase {
                 }), BackpressureStrategy.BUFFER);
     }
 
-    public Completable acceptFriendRequest(String user_id, String friend_id) {
-        return Completable.create(emitter -> {
-            User friend = getUserByID(friend_id).blockingGet().data;
-
-            assert friend != null;
-            userRepository.acceptFriendRequest(user_id, new Friend("", friend.getUser_id(),
-                            friend.getUsername(), friend.getFullname()))
-                    .addOnSuccessListener(e -> emitter.onComplete())
-                    .addOnFailureListener(emitter::onError);
-        });
-    }
-
     public Flowable<Resource<List<FriendRequest>>> getFriendRequests(String user_id) {
-        return Flowable.create(emitter -> userRepository.getFriendRequests(user_id)
+        return Flowable.create(emitter -> userRepository
+                .getFriendRequests(user_id)
                 .get().addOnCompleteListener(task -> {
                     if(!task.isSuccessful()) {
                         emitter.onError(new Exception("Something went wrong"));
@@ -135,8 +107,71 @@ public class UserUseCase {
                 }), BackpressureStrategy.BUFFER);
     }
 
+    public Completable addFriend(String user_id, String friend_username) {
+        return Completable.create(emitter -> {
+            User userRequest = getUserByID(user_id).blockingGet().data;
+            User userResponse = getUserByUsername(friend_username).blockingGet().data;
+
+            assert userRequest != null;
+            assert userResponse != null;
+
+            if(userRequest.getUser_id().equals(userResponse.getUser_id())) {
+                emitter.onError(new Exception("You can't add yourself"));
+                return;
+            }
+
+            userRepository.addFriend(userResponse.getUser_id(),
+                            new FriendRequest("",
+                                    userRequest.getUser_id(),
+                                    userRequest.getUsername()))
+                    .addOnSuccessListener(e -> emitter.onComplete())
+                    .addOnFailureListener(emitter::onError);
+        });
+    }
+
+    public Completable acceptFriendRequest(String user_id, String friend_id) {
+        return Completable.create(emitter -> {
+            User friend = getUserByID(friend_id).blockingGet().data;
+
+            assert friend != null;
+
+            userRepository.acceptFriendRequest(user_id,
+                            new Friend("",
+                            friend.getUser_id(),
+                            friend.getUsername(),
+                            friend.getFullname()))
+                    .addOnSuccessListener(e -> emitter.onComplete())
+                    .addOnFailureListener(emitter::onError);
+        });
+    }
+
+    public Completable changePassword(String user_id, String oldPassword, String newPassword) {
+        return Completable.create(emitter -> {
+            User user = getUserByID(user_id).blockingGet().data;
+
+            assert user != null;
+
+            if(!user.getPassword().equals(oldPassword)) {
+                emitter.onError(new Exception("Password was wrong"));
+                return;
+            }
+
+            if(user.getPassword().equals(newPassword)) {
+                emitter.onError(new Exception("New password can't be the same as the old password"));
+                return;
+            }
+
+            user.setPassword(newPassword);
+
+            userRepository.changePassword(user_id, user)
+                .addOnSuccessListener(e -> emitter.onComplete())
+                .addOnFailureListener(emitter::onError);
+        });
+    }
+
     public Completable deleteFriendRequest(String user_id, String friend_request_id) {
-        return Completable.create(emitter -> userRepository.deleteFriendRequest(user_id, friend_request_id)
+        return Completable.create(emitter -> userRepository
+                .deleteFriendRequest(user_id, friend_request_id)
                 .addOnSuccessListener(e -> emitter.onComplete())
                 .addOnFailureListener(emitter::onError));
     }

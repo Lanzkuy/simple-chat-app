@@ -21,13 +21,16 @@ public class ChatRepository implements IChatRepository {
     public Query getMessages(String user_id, String friend_id) {
         return firestore.collection(CHATS_COLLECTION)
                 .document(user_id + friend_id)
-                .collection(MESSAGES_COLLECTION).orderBy("last_message_time");
+                .collection(MESSAGES_COLLECTION)
+                .orderBy("last_message_time");
     }
 
     @Override
     public Task<Void> sendMessage(Message message, String chat_id) {
         return firestore.collection(CHATS_COLLECTION)
                 .document(chat_id)
-                .collection(MESSAGES_COLLECTION).document().set(message);
+                .collection(MESSAGES_COLLECTION)
+                .document()
+                .set(message);
     }
 }

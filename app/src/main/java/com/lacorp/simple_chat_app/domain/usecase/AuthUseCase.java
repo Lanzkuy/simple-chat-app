@@ -25,7 +25,8 @@ public class AuthUseCase {
     }
 
     public Single<Resource<User>> login(String username, String password) {
-        return Single.create(emitter -> authRepository.login(username, password)
+        return Single.create(emitter -> authRepository
+                .login(username, password)
                 .get().addOnCompleteListener(task -> {
             if(!task.isSuccessful()) {
                 emitter.onError(new Exception("Something went wrong"));
@@ -59,7 +60,8 @@ public class AuthUseCase {
     }
 
     public Single<Boolean> checkUsername(String username) {
-        return Single.create(emitter -> authRepository.checkUsername(username)
+        return Single.create(emitter -> authRepository
+                .checkUsername(username)
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
             if(queryDocumentSnapshots.isEmpty()) {
                 emitter.onSuccess(true);
