@@ -24,8 +24,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class ChatViewModel extends ViewModel {
 
-    private final MutableLiveData<Resource<List<Message>>> messages = new MutableLiveData<>();
-    private final MutableLiveData<Resource<Boolean>> sendMessage = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Message>>> messagesState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Boolean>> sendMessageState = new MutableLiveData<>();
     private final ChatUseCase chatUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -43,17 +43,17 @@ public class ChatViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeGetMessages().postValue(Resource.Loading(new ArrayList<>()));
+                        observeGetMessagesState().postValue(Resource.Loading(new ArrayList<>()));
                     }
 
                     @Override
                     public void onNext(@NonNull Resource<List<Message>> listResource) {
-                        observeGetMessages().postValue(listResource);
+                        observeGetMessagesState().postValue(listResource);
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeGetMessages().postValue(Resource.Failure(e));
+                        observeGetMessagesState().postValue(Resource.Failure(e));
                     }
 
                     @Override
@@ -75,27 +75,27 @@ public class ChatViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeSendMessage().postValue(Resource.Loading(true));
+                        observeSendMessageState().postValue(Resource.Loading(true));
                     }
 
                     @Override
                     public void onComplete() {
-                        observeSendMessage().postValue(Resource.Success(true));
+                        observeSendMessageState().postValue(Resource.Success(true));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeSendMessage().postValue(Resource.Failure(e));
+                        observeSendMessageState().postValue(Resource.Failure(e));
                     }
                 });
     }
 
-    public MutableLiveData<Resource<List<Message>>> observeGetMessages() {
-        return messages;
+    public MutableLiveData<Resource<List<Message>>> observeGetMessagesState() {
+        return messagesState;
     }
 
-    public MutableLiveData<Resource<Boolean>> observeSendMessage() {
-        return sendMessage;
+    public MutableLiveData<Resource<Boolean>> observeSendMessageState() {
+        return sendMessageState;
     }
 
     @Override

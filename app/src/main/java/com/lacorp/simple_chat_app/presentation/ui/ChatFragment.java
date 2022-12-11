@@ -7,11 +7,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -59,17 +66,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        AppCompatActivity activity = (AppCompatActivity)requireActivity();
+        Objects.requireNonNull(activity.getSupportActionBar()).setTitle(friend_name);
         chatViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
-        Objects.requireNonNull(((AppCompatActivity) requireActivity())
-                .getSupportActionBar()).setTitle(friend_name);
 
         initializeComponent();
-        try {
-            observeMessages();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeMessages();
     }
 
     @Override
@@ -80,7 +82,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             Message message = new Message(user_id, messageText, new Date());
             chatViewModel.sendMessage(message, friend_id);
 
-            chatViewModel.observeSendMessage().observe(getViewLifecycleOwner(), messageResource -> {
+            chatViewModel.observeSendMessageState().observe(getViewLifecycleOwner(), messageResource -> {
                 switch (messageResource.status) {
                     case SUCCESS: {
                         fragmentChatBinding.etMessage.setText("");
@@ -109,9 +111,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 LinearLayoutManager.VERTICAL, false));
     }
 
-    private void observeMessages() throws Exception {
+    private void observeMessages() {
         try {
-            chatViewModel.observeGetMessages().observe(getViewLifecycleOwner(), messageResource -> {
+            chatViewModel.observeGetMessagesState().observe(getViewLifecycleOwner(), messageResource -> {
                 switch (messageResource.status) {
                     case SUCCESS: {
                         if(messageResource.data != null) {
@@ -137,7 +139,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -20,7 +20,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class LoginViewModel extends ViewModel {
 
-    private final MutableLiveData<Resource<User>> loginUser = new MutableLiveData<>();
+    private final MutableLiveData<Resource<User>> loginState = new MutableLiveData<>();
     private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -41,38 +41,39 @@ public class LoginViewModel extends ViewModel {
                 .execute(password, true);
 
         if(!usernameValidation.getSuccessful()) {
-            observeLoginUser().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            observeLoginState().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
             return;
         }
 
         if(!passwordValidation.getSuccessful()) {
-            observeLoginUser().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            observeLoginState().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
             return;
         }
 
-        authUseCase.login(username, password).subscribeOn(Schedulers.io())
+        authUseCase.login(username, password)
+                .subscribeOn(Schedulers.io())
                 .subscribe(new SingleObserver<Resource<User>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeLoginUser().postValue(Resource.Loading(new User()));
+                        observeLoginState().postValue(Resource.Loading(new User()));
                     }
 
                     @Override
                     public void onSuccess(@NonNull Resource<User> userResource) {
                         assert userResource.data != null;
-                        observeLoginUser().postValue(Resource.Success(userResource.data));
+                        observeLoginState().postValue(Resource.Success(userResource.data));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeLoginUser().postValue(Resource.Failure(e));
+                        observeLoginState().postValue(Resource.Failure(e));
                     }
                 });
     }
 
-    public MutableLiveData<Resource<User>> observeLoginUser() {
-        return loginUser;
+    public MutableLiveData<Resource<User>> observeLoginState() {
+        return loginState;
     }
 
     @Override

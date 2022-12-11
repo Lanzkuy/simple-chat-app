@@ -1,6 +1,7 @@
 package com.lacorp.simple_chat_app.presentation.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 
@@ -16,7 +17,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if(savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
+            getSupportFragmentManager()
+                    .beginTransaction()
                     .setReorderingAllowed(true)
                     .replace(R.id.fragment_container_view, LoginFragment.class, null)
                     .commit();

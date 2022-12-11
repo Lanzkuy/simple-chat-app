@@ -24,9 +24,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class FriendRequestViewModel extends ViewModel {
 
-    private final MutableLiveData<Resource<List<FriendRequest>>> friendRequests = new MutableLiveData<>();
-    private final MutableLiveData<Resource<FriendRequest>> acceptRequestStatus = new MutableLiveData<>();
-    private final MutableLiveData<Resource<Boolean>> deleteRequestStatus = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<FriendRequest>>> friendRequestsState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<FriendRequest>> acceptRequestState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Boolean>> deleteRequestState = new MutableLiveData<>();
     private final UserUseCase userUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -43,7 +43,7 @@ public class FriendRequestViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeAcceptRequestStatus().postValue(Resource.Loading(friendRequest));
+                        observeAcceptRequestState().postValue(Resource.Loading(friendRequest));
                     }
 
                     @Override
@@ -52,36 +52,37 @@ public class FriendRequestViewModel extends ViewModel {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe();
-                        observeAcceptRequestStatus().postValue(Resource.Success(friendRequest));
+                        observeAcceptRequestState().postValue(Resource.Success(friendRequest));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeAcceptRequestStatus().postValue(Resource.Failure(e));
+                        observeAcceptRequestState().postValue(Resource.Failure(e));
                     }
                 });
     }
 
     public void getFriendRequests(String user_id) {
-        userUseCase.getFriendRequests(user_id).subscribeOn(Schedulers.io())
+        userUseCase.getFriendRequests(user_id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toObservable()
                 .subscribe(new Observer<Resource<List<FriendRequest>>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeFriendRequests().postValue(Resource.Loading(new ArrayList<>()));
+                        observeFriendRequestsState().postValue(Resource.Loading(new ArrayList<>()));
                     }
 
                     @Override
                     public void onNext(@NonNull Resource<List<FriendRequest>> friendRequestResource) {
                         assert friendRequestResource.data != null;
-                        observeFriendRequests().postValue(Resource.Success(friendRequestResource.data));
+                        observeFriendRequestsState().postValue(Resource.Success(friendRequestResource.data));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeFriendRequests().postValue(Resource.Failure(e));
+                        observeFriendRequestsState().postValue(Resource.Failure(e));
                     }
 
                     @Override
@@ -99,31 +100,31 @@ public class FriendRequestViewModel extends ViewModel {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeDeleteRequestStatus().postValue(Resource.Loading(true));
+                        observeDeleteRequestState().postValue(Resource.Loading(true));
                     }
 
                     @Override
                     public void onComplete() {
-                        observeDeleteRequestStatus().postValue(Resource.Success(true));
+                        observeDeleteRequestState().postValue(Resource.Success(true));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeDeleteRequestStatus().postValue(Resource.Failure(e));
+                        observeDeleteRequestState().postValue(Resource.Failure(e));
                     }
                 });
     }
 
-    public MutableLiveData<Resource<List<FriendRequest>>> observeFriendRequests() {
-        return friendRequests;
+    public MutableLiveData<Resource<List<FriendRequest>>> observeFriendRequestsState() {
+        return friendRequestsState;
     }
 
-    public MutableLiveData<Resource<FriendRequest>> observeAcceptRequestStatus() {
-        return acceptRequestStatus;
+    public MutableLiveData<Resource<FriendRequest>> observeAcceptRequestState() {
+        return acceptRequestState;
     }
 
-    public MutableLiveData<Resource<Boolean>> observeDeleteRequestStatus() {
-        return deleteRequestStatus;
+    public MutableLiveData<Resource<Boolean>> observeDeleteRequestState() {
+        return deleteRequestState;
     }
 
     @Override

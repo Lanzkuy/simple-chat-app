@@ -50,12 +50,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         checkSession();
         initializeComponent();
-        try {
-            observeLogin();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeLogin();
     }
 
     @Override
@@ -80,7 +75,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         String user_id = sharedPreferences.getString("user_id", null);
         if(user_id != null) {
             if(!user_id.isEmpty()) {
-                requireActivity().getSupportFragmentManager().beginTransaction()
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
                         .replace(R.id.fragment_container_view, HomeFragment.class, null)
                         .commit();
             }
@@ -93,15 +89,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         fragmentLoginBinding.tvRegister.setOnClickListener(this);
     }
 
-    private void observeLogin() throws Exception {
+    private void observeLogin() {
         try {
-            loginViewModel.observeLoginUser().observe(getViewLifecycleOwner(), userResource -> {
+            loginViewModel.observeLoginState().observe(getViewLifecycleOwner(), userResource -> {
                 switch (userResource.status) {
                     case SUCCESS: {
                         progressBarOff();
                         if(userResource.data != null) {
                             editor.putString("user_id", userResource.data.getUser_id()).apply();
-                            requireActivity().getSupportFragmentManager().beginTransaction()
+                            requireActivity().getSupportFragmentManager()
+                                    .beginTransaction()
                                     .replace(R.id.fragment_container_view, HomeFragment.class, null)
                                     .commit();
                         }
@@ -121,7 +118,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             });
         }
         catch (Exception ex) {
-            throw new Exception(ex);
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -8,24 +8,22 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
 import com.lacorp.simple_chat_app.databinding.FragmentChangePasswordBinding;
-import com.lacorp.simple_chat_app.databinding.FragmentFriendRequestBinding;
-import com.lacorp.simple_chat_app.databinding.FragmentLoginBinding;
-import com.lacorp.simple_chat_app.domain.entities.User;
-import com.lacorp.simple_chat_app.presentation.adapter.FriendRequestAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.ChangePasswordViewModel;
-import com.lacorp.simple_chat_app.presentation.viewmodel.FriendRequestViewModel;
-import com.lacorp.simple_chat_app.presentation.viewmodel.LoginViewModel;
 
 import java.util.Objects;
 
@@ -53,15 +51,12 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        AppCompatActivity activity = (AppCompatActivity)requireActivity();
+        Objects.requireNonNull(activity.getSupportActionBar()).setTitle("Change Password");
         changePasswordViewModel = new ViewModelProvider(this).get(ChangePasswordViewModel.class);
 
         initializeComponent();
-        try {
-            observeAcceptFriendRequest();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeAcceptFriendRequest();
     }
 
     @Override
@@ -96,9 +91,9 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
         fragmentChangePasswordBinding.btnSubmit.setOnClickListener(this);
     }
 
-    private void observeAcceptFriendRequest() throws Exception {
+    private void observeAcceptFriendRequest() {
         try {
-            changePasswordViewModel.observeChangePassword().observe(getViewLifecycleOwner(), changePasswordResource -> {
+            changePasswordViewModel.observeChangePasswordState().observe(getViewLifecycleOwner(), changePasswordResource -> {
                 switch (changePasswordResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -126,7 +121,7 @@ public class ChangePasswordFragment extends Fragment implements View.OnClickList
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

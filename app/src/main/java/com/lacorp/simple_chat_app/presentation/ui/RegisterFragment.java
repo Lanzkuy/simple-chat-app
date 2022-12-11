@@ -15,14 +15,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
-import com.lacorp.simple_chat_app.domain.entities.Friend;
-import com.lacorp.simple_chat_app.domain.entities.FriendRequest;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentRegisterBinding;
 import com.lacorp.simple_chat_app.presentation.viewmodel.RegisterViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -45,12 +40,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         initializeComponent();
-        try {
-            observeRegister();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeRegister();
     }
 
     @Override
@@ -69,8 +59,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                     .show();
         }
         else if(id == R.id.tvLogin) {
-            requireActivity()
-                .getSupportFragmentManager().beginTransaction()
+            requireActivity().getSupportFragmentManager()
+                .beginTransaction()
                 .replace(R.id.fragment_container_view, LoginFragment.class, null)
                 .commit();
         }
@@ -81,15 +71,16 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         fragmentRegisterBinding.tvLogin.setOnClickListener(this);
     }
 
-    private void observeRegister() throws Exception {
+    private void observeRegister() {
         try {
-            registerViewModel.observeRegisterUser().observe(getViewLifecycleOwner(), registerResource -> {
+            registerViewModel.observeRegisterState().observe(getViewLifecycleOwner(), registerResource -> {
                 switch (registerResource.status) {
                     case SUCCESS: {
                         progressBarOff();
                         if(registerResource.data != null) {
                             Toast.makeText(requireContext(), "Register successfully", Toast.LENGTH_SHORT).show();
-                            requireActivity().getSupportFragmentManager().beginTransaction()
+                            requireActivity().getSupportFragmentManager()
+                                    .beginTransaction()
                                     .replace(R.id.fragment_container_view, LoginFragment.class, null)
                                     .commit();
                         }
@@ -109,7 +100,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -7,11 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -49,24 +54,19 @@ public class FriendRequestFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        friendRequestViewModel = new ViewModelProvider(this).get(FriendRequestViewModel.class);
         AppCompatActivity activity = (AppCompatActivity)requireActivity();
         Objects.requireNonNull(activity.getSupportActionBar()).setTitle("Friend Request");
+        friendRequestViewModel = new ViewModelProvider(this).get(FriendRequestViewModel.class);
 
         initializeComponent();
-        try {
-            observeGetFriendRequests();
-            observeAcceptFriendRequest();
-            observeDeleteFriendRequest();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeGetFriendRequests();
+        observeAcceptFriendRequest();
+        observeDeleteFriendRequest();
     }
 
-    private void observeGetFriendRequests() throws Exception {
+    private void observeGetFriendRequests() {
         try {
-            friendRequestViewModel.observeFriendRequests().observe(getViewLifecycleOwner(), friendRequestsResource -> {
+            friendRequestViewModel.observeFriendRequestsState().observe(getViewLifecycleOwner(), friendRequestsResource -> {
                 switch (friendRequestsResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -93,13 +93,13 @@ public class FriendRequestFragment extends Fragment {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void observeAcceptFriendRequest() throws Exception {
+    private void observeAcceptFriendRequest() {
         try {
-            friendRequestViewModel.observeAcceptRequestStatus().observe(getViewLifecycleOwner(), acceptFriendRequestsResource -> {
+            friendRequestViewModel.observeAcceptRequestState().observe(getViewLifecycleOwner(), acceptFriendRequestsResource -> {
                 switch (acceptFriendRequestsResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -125,13 +125,13 @@ public class FriendRequestFragment extends Fragment {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void observeDeleteFriendRequest() throws Exception {
+    private void observeDeleteFriendRequest() {
         try {
-            friendRequestViewModel.observeDeleteRequestStatus().observe(getViewLifecycleOwner(), deleteFriendRequestsResource -> {
+            friendRequestViewModel.observeDeleteRequestState().observe(getViewLifecycleOwner(), deleteFriendRequestsResource -> {
                 switch (deleteFriendRequestsResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -155,7 +155,7 @@ public class FriendRequestFragment extends Fragment {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

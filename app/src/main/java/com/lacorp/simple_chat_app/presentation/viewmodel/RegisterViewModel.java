@@ -21,7 +21,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 @HiltViewModel
 public class RegisterViewModel extends ViewModel {
 
-    private final MutableLiveData<Resource<Boolean>> registerUser = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Boolean>> registerState = new MutableLiveData<>();
     private final AuthUseCase authUseCase;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -47,43 +47,44 @@ public class RegisterViewModel extends ViewModel {
                 .execute(user.getFullname());
 
         if(!usernameValidation.getSuccessful()) {
-            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
+            observeRegisterState().postValue(Resource.Failure(new IllegalArgumentException(usernameValidation.getErrorMessage())));
             return;
         }
 
         if(!passwordValidation.getSuccessful()) {
-            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
+            observeRegisterState().postValue(Resource.Failure(new IllegalArgumentException(passwordValidation.getErrorMessage())));
             return;
         }
 
         if(!fullnameValidation.getSuccessful()) {
-            observeRegisterUser().postValue(Resource.Failure(new IllegalArgumentException(fullnameValidation.getErrorMessage())));
+            observeRegisterState().postValue(Resource.Failure(new IllegalArgumentException(fullnameValidation.getErrorMessage())));
             return;
         }
 
-        authUseCase.register(user).subscribeOn(Schedulers.io())
+        authUseCase.register(user)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disposable.add(d);
-                        observeRegisterUser().postValue(Resource.Loading(true));
+                        observeRegisterState().postValue(Resource.Loading(true));
                     }
 
                     @Override
                     public void onComplete() {
-                        observeRegisterUser().postValue(Resource.Success(true));
+                        observeRegisterState().postValue(Resource.Success(true));
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        observeRegisterUser().postValue(Resource.Failure(e));
+                        observeRegisterState().postValue(Resource.Failure(e));
                     }
                 });
     }
 
-    public MutableLiveData<Resource<Boolean>> observeRegisterUser() {
-        return registerUser;
+    public MutableLiveData<Resource<Boolean>> observeRegisterState() {
+        return registerState;
     }
 
     @Override

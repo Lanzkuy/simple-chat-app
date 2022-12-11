@@ -1,13 +1,5 @@
 package com.lacorp.simple_chat_app.domain.usecase;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.lacorp.simple_chat_app.domain.entities.Friend;
 import com.lacorp.simple_chat_app.domain.entities.FriendRequest;
 import com.lacorp.simple_chat_app.domain.entities.User;
@@ -26,9 +18,15 @@ import io.reactivex.rxjava3.core.Single;
 public class UserUseCase {
 
     private final IUserRepository userRepository;
+    private final ValidatorUseCase validatorUseCase;
 
-    public UserUseCase(IUserRepository userRepository) {
+    public UserUseCase(IUserRepository userRepository, ValidatorUseCase validatorUseCase) {
         this.userRepository = userRepository;
+        this.validatorUseCase = validatorUseCase;
+    }
+
+    public ValidatorUseCase getValidatorUseCase() {
+        return validatorUseCase;
     }
 
     public Single<Resource<User>> getUserByID(String user_id) {

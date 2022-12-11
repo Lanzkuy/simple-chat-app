@@ -40,8 +40,8 @@ public class UseCaseModule {
 
     @Provides
     @Singleton
-    public UserUseCase provideUserUseCase(IUserRepository userRepository) {
-        return new UserUseCase(userRepository);
+    public UserUseCase provideUserUseCase(IUserRepository userRepository, ValidatorUseCase validatorUseCase) {
+        return new UserUseCase(userRepository, validatorUseCase);
     }
 
     @Provides

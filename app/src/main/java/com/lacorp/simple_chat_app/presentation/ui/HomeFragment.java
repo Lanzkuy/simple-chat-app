@@ -1,6 +1,5 @@
 package com.lacorp.simple_chat_app.presentation.ui;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -28,7 +27,6 @@ import android.widget.Toast;
 
 import com.lacorp.simple_chat_app.R;
 import com.lacorp.simple_chat_app.domain.entities.Friend;
-import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.databinding.FragmentHomeBinding;
 import com.lacorp.simple_chat_app.presentation.adapter.ChatRoomAdapter;
 import com.lacorp.simple_chat_app.presentation.viewmodel.HomeViewModel;
@@ -61,19 +59,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         AppCompatActivity activity = (AppCompatActivity)requireActivity();
         Objects.requireNonNull(activity.getSupportActionBar()).show();
         Objects.requireNonNull(activity.getSupportActionBar()).setTitle("Chat App");
+        Objects.requireNonNull(activity.getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
+        Objects.requireNonNull(activity.getSupportActionBar()).setDisplayShowHomeEnabled(false);
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         initializeComponent();
-        try {
-            observeGetFriends();
-            observeAddFriendStatus();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        observeGetFriends();
+        observeAddFriendStatus();
 
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {
@@ -85,7 +80,8 @@ public class HomeFragment extends Fragment {
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 if(menuItem.getItemId() == R.id.menuChangePassword) {
-                    requireActivity().getSupportFragmentManager().beginTransaction()
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
                             .replace(R.id.fragment_container_view, ChangePasswordFragment.class, null)
                             .addToBackStack(null)
                             .commit();
@@ -98,20 +94,21 @@ public class HomeFragment extends Fragment {
                     etUsername.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(etUsername);
 
-                    builder.setPositiveButton("Ok", (dialogInterface, i) -> {
-                        homeViewModel.addFriend(sharedPreferences.getString("user_id", null)
-                                , etUsername.getText().toString());
-                    }).show();
+                    builder.setPositiveButton("Ok", (dialogInterface, i) -> homeViewModel
+                            .addFriend(sharedPreferences.getString("user_id", null)
+                            , etUsername.getText().toString())).show();
                 }
                 else if(menuItem.getItemId() == R.id.menuFriendRequests) {
-                    requireActivity().getSupportFragmentManager().beginTransaction()
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
                             .replace(R.id.fragment_container_view, FriendRequestFragment.class, null)
                             .addToBackStack(null)
                             .commit();
                 }
                 else if(menuItem.getItemId() == R.id.menuLogout) {
                     editor.putString("user_id", "").apply();
-                    requireActivity().getSupportFragmentManager().beginTransaction()
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
                             .replace(R.id.fragment_container_view, LoginFragment.class, null)
                             .commit();
                 }
@@ -127,9 +124,9 @@ public class HomeFragment extends Fragment {
                 LinearLayoutManager.VERTICAL, false));
     }
 
-    private void observeGetFriends() throws Exception {
+    private void observeGetFriends() {
         try {
-            homeViewModel.observeFriends().observe(getViewLifecycleOwner(), friendsResource -> {
+            homeViewModel.observeFriendsState().observe(getViewLifecycleOwner(), friendsResource -> {
                 switch (friendsResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -145,8 +142,9 @@ public class HomeFragment extends Fragment {
                                 ChatFragment chatFragment = new ChatFragment();
                                 chatFragment.setArguments(bundle);
 
-                                requireActivity().getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragment_container_view, chatFragment, null)
+                                requireActivity().getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.fragment_container_view, chatFragment)
                                         .addToBackStack(null)
                                         .commit();
                             });
@@ -169,13 +167,13 @@ public class HomeFragment extends Fragment {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void observeAddFriendStatus() throws Exception {
+    private void observeAddFriendStatus() {
         try {
-            homeViewModel.observeAddFriendsStatus().observe(getViewLifecycleOwner(), addFriendStatusResource -> {
+            homeViewModel.observeAddFriendsState().observe(getViewLifecycleOwner(), addFriendStatusResource -> {
                 switch (addFriendStatusResource.status) {
                     case SUCCESS: {
                         progressBarOff();
@@ -198,7 +196,7 @@ public class HomeFragment extends Fragment {
             });
         }
         catch (Exception ex) {
-            throw new Exception();
+            Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 
