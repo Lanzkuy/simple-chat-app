@@ -73,7 +73,7 @@
             android:layout_marginVertical="8dp"
             android:background="@drawable/edit_text_background"
             android:hint="@string/text_fullname"
-            android:inputType="textPassword"
+            android:inputType="text"
             android:paddingHorizontal="16dp"
             android:textColor="@color/custom_black"
             android:textColorHint="@color/custom_placeholder"
