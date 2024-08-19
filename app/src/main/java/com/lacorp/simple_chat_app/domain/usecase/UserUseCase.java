@@ -2,6 +2,7 @@ package com.lacorp.simple_chat_app.domain.usecase;
 
 import com.lacorp.simple_chat_app.domain.entities.Friend;
 import com.lacorp.simple_chat_app.domain.entities.FriendRequest;
+import com.lacorp.simple_chat_app.domain.entities.Message;
 import com.lacorp.simple_chat_app.domain.entities.User;
 import com.lacorp.simple_chat_app.domain.repository.IUserRepository;
 import com.lacorp.simple_chat_app.domain.usecase.validator.ValidatorUseCase;
@@ -70,20 +71,34 @@ public class UserUseCase {
     public Flowable<Resource<List<Friend>>> getFriends(String user_id) {
         return Flowable.create(emitter -> userRepository
                 .getFriends(user_id)
-                .get().addOnCompleteListener(task -> {
-                    if(!task.isSuccessful()) {
+                .addSnapshotListener((value, error) -> {
+                    if(error != null) {
                         emitter.onError(new Exception("Something went wrong"));
                         return;
                     }
 
-                    List<Friend> friends = task.getResult().toObjects(Friend.class);
-                    if(friends.isEmpty()) {
+                    if (value == null) {
                         emitter.onNext(Resource.Success(new ArrayList<>()));
                         return;
                     }
 
+                    List<Friend> friends = value.toObjects(Friend.class);
                     emitter.onNext(Resource.Success(friends));
                 }), BackpressureStrategy.BUFFER);
+//                .get().addOnCompleteListener(task -> {
+//                    if(!task.isSuccessful()) {
+//                        emitter.onError(new Exception("Something went wrong"));
+//                        return;
+//                    }
+//
+//                    List<Friend> friends = task.getResult().toObjects(Friend.class);
+//                    if(friends.isEmpty()) {
+//                        emitter.onNext(Resource.Success(new ArrayList<>()));
+//                        return;
+//                    }
+//
+//                    emitter.onNext(Resource.Success(friends));
+//                }), BackpressureStrategy.BUFFER);
     }
 
     public Flowable<Resource<List<FriendRequest>>> getFriendRequests(String user_id) {

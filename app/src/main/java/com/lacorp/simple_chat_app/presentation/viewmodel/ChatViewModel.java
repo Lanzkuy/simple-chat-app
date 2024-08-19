@@ -48,7 +48,8 @@ public class ChatViewModel extends ViewModel {
 
                     @Override
                     public void onNext(@NonNull Resource<List<Message>> listResource) {
-                        observeGetMessagesState().postValue(listResource);
+                        assert listResource.data != null;
+                        observeGetMessagesState().postValue(Resource.Success(listResource.data));
                     }
 
                     @Override

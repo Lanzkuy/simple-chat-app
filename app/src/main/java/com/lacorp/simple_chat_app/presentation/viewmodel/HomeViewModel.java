@@ -34,29 +34,6 @@ public class HomeViewModel extends ViewModel {
         this.userUseCase = userUseCase;
     }
 
-    public void addFriend(String user_id, String friend_username) {
-        userUseCase.addFriend(user_id, friend_username)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        disposable.add(d);
-                        observeAddFriendsState().postValue(Resource.Loading(true));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        observeAddFriendsState().postValue(Resource.Success(true));
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        observeAddFriendsState().postValue(Resource.Failure(e));
-                    }
-                });
-    }
-
     public void getFriends(String user_id) {
         userUseCase.getFriends(user_id)
                 .subscribeOn(Schedulers.io())
@@ -83,6 +60,29 @@ public class HomeViewModel extends ViewModel {
                     @Override
                     public void onComplete() {
 
+                    }
+                });
+    }
+
+    public void addFriend(String user_id, String friend_username) {
+        userUseCase.addFriend(user_id, friend_username)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        disposable.add(d);
+                        observeAddFriendsState().postValue(Resource.Loading(true));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        observeAddFriendsState().postValue(Resource.Success(true));
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        observeAddFriendsState().postValue(Resource.Failure(e));
                     }
                 });
     }
